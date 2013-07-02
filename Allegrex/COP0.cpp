@@ -256,7 +256,6 @@ void COP0::generalException(){
 			reg[EPC] = cpu.PC;
 		}
 TODO("set cause register")
-#warning "GTP"
 /*
 		if(TLBrefill){
 			vector=0x000
@@ -374,11 +373,12 @@ uint32 COP0::addressTranslation(const uint32 vAddr, bool &cachable) const{
 }
 
 uint32 COP0::loadMemory32(const uint32 vAddr){
+TODO("Finish cache implementation")
 //	uint32 pAddr = AddressTranslation(vAddr, DATA);
 //	pAddr &= 0xfffffffC;
 //	uint32 mem = loadMemory(uncached, WORD, pAddr, vAddr, DATA);
 //	cpu.GPR[u.i.rt] = mem;
-
+/*
 	if(!validateAddress(vAddr)){
 		throw("Address error exception");
 	}
@@ -390,7 +390,6 @@ uint32 COP0::loadMemory32(const uint32 vAddr){
 	cachable = false;
 
 	if(cachable){
-TODO("Finish cache implementation")
 		//read from cache
 		const uint32 line = (vAddr & 0x00007fe0) >> 5;
 		const uint32 word = vAddr & 0x0000001f;
@@ -407,6 +406,6 @@ TODO("Finish cache implementation")
 		dataPending = false;
 		return receivedData;
 	}
-
+*/
 	return 0;
 }
