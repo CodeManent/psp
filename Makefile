@@ -46,7 +46,7 @@ targets: $(TARGET_BIN) $(TARGET_SBIN) $(TARGET_ETC) $(TARGET_LIB)
 
 .PHONY: clean
 clean:
-	$(RM) $(CLEAN)
+	@$(RM) $(CLEAN) $(TARGET_BIN)
 
 .PHONY: run
 run: $(TARGET_BIN)
