@@ -33,8 +33,8 @@ Allegrex::~Allegrex(void)
 {
 }
 
-std::auto_ptr<Instruction> Allegrex::decode(const uint32 &inst) const{
-	std::auto_ptr<Instruction> retval;
+std::unique_ptr<Instruction> Allegrex::decode(const uint32 &inst) const{
+	std::unique_ptr<Instruction> retval;
 
 	retval.reset(new UnimplementedOp(inst));
 
@@ -196,12 +196,12 @@ string Allegrex::disassemble(const uint32 base[], size_t size) const {
 }
 
 std::string Allegrex::disassemble(const unsigned int &inst) const{
-	std::auto_ptr<Instruction> i  = decode(inst);
+	std::unique_ptr<Instruction> i  = decode(inst);
 	return i->disassemble();
 }
 
 void Allegrex::execute(const uint32 &inst){
-	std::auto_ptr<Instruction> i = decode(inst);
+	std::unique_ptr<Instruction> i = decode(inst);
 	i->execute(*this);
 }
 

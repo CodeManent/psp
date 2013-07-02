@@ -35,7 +35,7 @@ public:
 	Allegrex(PSP *bus);
 	~Allegrex(void);
 
-	std::auto_ptr<Instruction> decode(const uint32 &inst) const;
+	std::unique_ptr<Instruction> decode(const uint32 &inst) const;
 	std::string disassemble(const uint32 base[], size_t count, const uint32 baseAddress) const;
 	std::string disassemble(const uint32 base[], size_t count) const;
 	std::string disassemble(const uint32 &inst) const;
