@@ -19,7 +19,7 @@ std::string LW::disassemble() const{
 }
 
 void LW::execute(Allegrex &cpu) const{
-#pragma TODO("proper implementation")
+	TODO("proper implementation")
 	const uint32 vAddr = static_cast<int32>(static_cast<uint32>(u.i.immediate)) + cpu.GPR[u.i.rs];
 //	uint32 pAddr = AddressTranslation(vAddr, DATA);
 //	pAddr &= 0xfffffffC;

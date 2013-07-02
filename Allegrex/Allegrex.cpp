@@ -52,7 +52,7 @@ std::auto_ptr<Instruction> Allegrex::decode(const uint32 &inst) const{
 			}
 			break;
 		/*  0x1 reserved or unsupported */
-#pragma TODO("complete special instructions")
+		TODO("complete special instructions")
 		case opSRLROR:	return retval;
 		case opSRA:	retval.reset(new SRA(inst));	break;
 		case opSLLV:retval.reset(new SLLV(inst));	break;
@@ -118,7 +118,7 @@ std::auto_ptr<Instruction> Allegrex::decode(const uint32 &inst) const{
 	case opORI:		retval.reset(new ORI(inst));	break;
 	case opXORI:	retval.reset(new XORI(inst));	break;
 	case opLUI:		retval.reset(new LUI(inst));	break;
-#pragma TODO("complete regular instructions")
+	TODO("complete regular instructions")
 	case opCOP0:
 	case opCOP1:
 	case opVFPU2:

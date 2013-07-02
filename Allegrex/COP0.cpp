@@ -164,7 +164,7 @@ COP0::COP0(Allegrex &al)
 	stagLoReg(reinterpret_cast<STagLoRegister &>(reg[TagLo]))
 {
 	pridReg.imp = 0x04;//R4000
-#pragma TODO("proper revision number")
+	TODO("proper revision number")
 	pridReg.rev = 1;//??? I just added it
 
 	statusReg.DSTS = 0;
@@ -178,7 +178,7 @@ COP0::~COP0(void)
 {
 }
 
-#pragma TODO("method parameters")
+TODO("method parameters")
 void COP0::reset(){
 	//reg[Random] = TLBENTRIES - 1;
 
@@ -255,7 +255,7 @@ void COP0::generalException(){
 		else{
 			reg[EPC] = cpu.PC;
 		}
-#pragma TODO("set cause register")
+TODO("set cause register")
 #warning "GTP"
 /*
 		if(TLBrefill){
@@ -272,7 +272,7 @@ void COP0::generalException(){
 		vector=0x180;
 	}
 	else{
-#pragma TODO("set cause register")
+TODO("set cause register")
 		vector=0x180;
 	}
 
@@ -390,7 +390,7 @@ uint32 COP0::loadMemory32(const uint32 vAddr){
 	cachable = false;
 
 	if(cachable){
-#pragma TODO("Finish cache implementation")
+TODO("Finish cache implementation")
 		//read from cache
 		const uint32 line = (vAddr & 0x00007fe0) >> 5;
 		const uint32 word = vAddr & 0x0000001f;
