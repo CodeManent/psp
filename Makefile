@@ -1,6 +1,6 @@
 ## Build flags for all targets
 #
-CXXFLAGS = -g -Wall -std=c++0x
+CXXFLAGS = -g -Wall -Werror -std=c++0x
 CC       = $(CXX)
 CFLAGS   = $(CXXFLAGS)
 LDFLAGS =
