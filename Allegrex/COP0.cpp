@@ -372,13 +372,17 @@ uint32 COP0::addressTranslation(const uint32 vAddr, bool &cachable) const{
 	}
 }
 
+/*
+ * Loads data by requesting them from the main memory through the main bus.
+ *
+ * The implementation ignores the cache for now and always loads from memory.
+ */
 uint32 COP0::loadMemory32(const uint32 vAddr){
-TODO("Finish cache implementation")
 //	uint32 pAddr = AddressTranslation(vAddr, DATA);
 //	pAddr &= 0xfffffffC;
 //	uint32 mem = loadMemory(uncached, WORD, pAddr, vAddr, DATA);
 //	cpu.GPR[u.i.rt] = mem;
-/*
+
 	if(!validateAddress(vAddr)){
 		throw("Address error exception");
 	}
@@ -386,26 +390,45 @@ TODO("Finish cache implementation")
 	bool cachable;
 	const uint32 pAddr = addressTranslation(vAddr, cachable);
 
-
+	//Remove it after cache implementation
 	cachable = false;
 
 	if(cachable){
 		//read from cache
+		/*
 		const uint32 line = (vAddr & 0x00007fe0) >> 5;
 		const uint32 word = vAddr & 0x0000001f;
 		dCacheLine &dcl = dCache[line];
+		*/
+		TODO("Finish cache implementation")
+		return 0;
 	}
 	else{
 		//read from memory
-		const BusDevice::Request r = {BusDevice::devCPU, BusDevice::devMainMemory, BusDevice::Read, vAddr, 0};
+		const BusDevice::Request r = {BusDevice::devCPU, BusDevice::devMainMemory, BusDevice::Read, pAddr, 0};
 		cpu.sendRequest(r);
+		//With the current implementation the control will return here after the data are read
+		//so no wait is actually needed (but leave it because no harm is done now).
 
 		while(!dataPending){
 			//wait
 		}
-		dataPending = false;
 		return receivedData;
 	}
-*/
-	return 0;
 }
+
+/*
+ * Received data after they have been requested.
+ * The loadMemory32 requests the data and receiveData puts them in the temporary
+ * variable receivedData. When the loadMemory resumes its execution, it will use the data.
+ *
+ * If data were received without being requested, they are ignored.
+ */
+void COP0::receiveData(uint32 data){
+	if(dataPending)
+	{
+		receivedData = data;
+		dataPending = false;
+	}
+}
+

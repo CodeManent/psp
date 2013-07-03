@@ -41,6 +41,12 @@ void PSP::sendRequest(const struct BusDevice::Request &r){
 	requestQueue.push(r);
 }
 
+/*
+ * Forwards the requests between devices.
+ *
+ * Right now it is used only for communication between the cpu and the 
+ * main memory (and in a hackins way of them handling the requests).
+ */
 void PSP::forwardRequests(){
 
 	while(!requestQueue.empty()){
@@ -50,7 +56,11 @@ void PSP::forwardRequests(){
 
 	#define throwErrorCase(x) case BusDevice::x : throw(#x " is not connected")
 
-		throwErrorCase(devCPU);
+		//throwErrorCase(devCPU);
+
+		case BusDevice::devCPU:
+			cpu->serviceRequest(req);
+			break;
 
 		case BusDevice::devMainMemory:
 			mainMemory->serviceRequest(req);
