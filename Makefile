@@ -1,11 +1,11 @@
 ## Build flags for all targets
 #
-CXXFLAGS = -g -Wall -Werror -std=c++0x
+CXXFLAGS += -g -Wall -Werror -std=c++0x -DTEST_
 CC       = $(CXX)
 CFLAGS   = $(CXXFLAGS)
-LDFLAGS =
-LF_ALL   =
-LL_ALL   =
+LDFLAGS +=
+LF_ALL   +=
+LL_ALL   +=
 
 BINDIR=../bin
 # custom rules

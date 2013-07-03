@@ -16,6 +16,8 @@
 
 #include <cstddef> // size_t
 #include <queue>
+class MainMemory;
+class Allegrex;
 
 class PSP
 {
@@ -31,6 +33,11 @@ public:
 
 	void run();
 	void sendRequest(const struct BusDevice::Request &req);
+
+	//Testing methods (to be removed)
+	Allegrex* getCPU();
+
+	MainMemory* getMainMemory();
 
 private:
 	void forwardRequests();

@@ -406,13 +406,18 @@ uint32 COP0::loadMemory32(const uint32 vAddr){
 	else{
 		//read from memory
 		const BusDevice::Request r = {BusDevice::devCPU, BusDevice::devMainMemory, BusDevice::Read, pAddr, 0};
+
+		//enable the flag so to accept the data form the bus
+		dataPending = true;
+
 		cpu.sendRequest(r);
 		//With the current implementation the control will return here after the data are read
 		//so no wait is actually needed (but leave it because no harm is done now).
 
-		while(!dataPending){
+		while(dataPending){
 			//wait
 		}
+
 		return receivedData;
 	}
 }

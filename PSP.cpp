@@ -37,8 +37,15 @@ void PSP::run(){
 //	}
 }
 
+/*
+ * The method that is called to send a request from a device to another
+ *
+ * HACK: immediately forward the request to the interested device
+ */
 void PSP::sendRequest(const struct BusDevice::Request &r){
 	requestQueue.push(r);
+
+	forwardRequests();
 }
 
 /*
@@ -51,6 +58,7 @@ void PSP::forwardRequests(){
 
 	while(!requestQueue.empty()){
 		BusDevice::Request &req = requestQueue.front();
+		requestQueue.pop();
 
 		switch(req.to){
 
@@ -76,7 +84,14 @@ void PSP::forwardRequests(){
 		default:
 			throw std::logic_error("Device does not exist");
 		}
-
-		requestQueue.pop();
 	}
 }
+
+Allegrex* PSP::getCPU(){
+	return dynamic_cast<Allegrex*>(cpu);
+}
+
+MainMemory* PSP::getMainMemory(){
+	return dynamic_cast<MainMemory*>(mainMemory);
+}
+

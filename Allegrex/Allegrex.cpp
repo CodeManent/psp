@@ -231,6 +231,8 @@ void Allegrex::serviceRequest(const struct Request &req){
 			break;
 
 		case BusDevice::Reply:
+			systemCoprocessor.receiveData(req.param1);
+			break;
 			//systemCoprocessor.
 
 		case BusDevice::Read:
