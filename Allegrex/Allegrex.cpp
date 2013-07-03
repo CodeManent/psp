@@ -33,7 +33,7 @@ Allegrex::~Allegrex(void)
 {
 }
 
-std::unique_ptr<Instruction> Allegrex::decode(const uint32 &inst) const{
+std::unique_ptr<Instruction> Allegrex::decode(const uint32 &inst) {
 	std::unique_ptr<Instruction> retval;
 
 	retval.reset(new UnimplementedOp(inst));
@@ -174,31 +174,7 @@ std::unique_ptr<Instruction> Allegrex::decode(const uint32 &inst) const{
 	return retval;
 }
 
-string Allegrex::disassemble(const uint32 base[], size_t size, const uint32 baseAddress) const {
-	ostringstream oss;
 
-	for(size_t i = 0; i < size; ++i){
-		oss 
-			<< "0x" << hex << setw(8) << setfill('0') << (baseAddress + 4*i)
-			<< "\t0x" << hex << setw(8) << setfill('0') << base[i] 
-			<< "\t" <<  disassemble(base[i]) << endl;
-	}
-	return oss.str();
-}
-
-string Allegrex::disassemble(const uint32 base[], size_t size) const {
-	ostringstream oss;
-
-	for(size_t i = 0; i < size; ++i){
-		oss << "0x" << hex << setw(8) << setfill('0') << base[i] << "\t" <<  disassemble(base[i]) << endl;
-	}
-	return oss.str();
-}
-
-std::string Allegrex::disassemble(const unsigned int &inst) const{
-	std::unique_ptr<Instruction> i  = decode(inst);
-	return i->disassemble();
-}
 
 void Allegrex::execute(const uint32 &inst){
 	std::unique_ptr<Instruction> i = decode(inst);

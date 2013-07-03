@@ -43,7 +43,8 @@ class Instruction
 
 		unsigned int op        : 6;					// XXXXXX--------------------------
 	} ;
-*/
+
+
 	struct INSTRUCTION{
         uint32 source;
         uint32 target;          // ------XXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -56,7 +57,7 @@ class Instruction
         uint8 rs;				// ------XXXXX---------------------
         uint8 op;				// XXXXXX--------------------------
 	};
-
+*/
 										// |------------32 bit------------|
 										// 32-----------------------------0
 	// immediate type
@@ -124,8 +125,12 @@ public:
 	virtual ~Instruction(void);
 
 	virtual std::string disassemble() const = 0;
+	static std::string disassemble(const uint32 &inst);
+	static std::string disassemble(const uint32 base[], size_t count);
+	static std::string disassemble(const uint32 base[], size_t count, const uint32 baseAddress);
+
+
 	virtual void execute(Allegrex &cpu) const = 0;
-//#pragma TODO("implement virtual getInstance()")
 
 	std::string strRs() const;
 	std::string strRt()const;

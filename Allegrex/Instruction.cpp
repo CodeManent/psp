@@ -1,4 +1,5 @@
 #include "Instruction.h"
+#include "Allegrex.h"
 #include <sstream>
 #include <iomanip>
 
@@ -16,6 +17,60 @@ Instruction::Instruction(const uint32 instruction): inst(instruction), u(reinter
 Instruction::~Instruction(void)
 {
 }
+
+/*
+ * Disassembles an instruction.
+ *
+ * Returns a string representation of the instruction passed as parameter.
+ * Uses the Allegrex decoder to get an object representing the current instruction
+ * and then using the virtual method disassemble gets the actual string.
+ */
+std::string Instruction::disassemble(const unsigned int &inst) {
+	std::unique_ptr<Instruction> i  = Allegrex::decode(inst);
+	return i->disassemble();
+}
+
+/*
+ * Disassembles an array of instructions.
+ *
+ * The output consists of two columns:
+ *     - The hex representation of the current instruction.
+ *     - The disassembled instruction.
+ */
+std::string Instruction::disassemble(const uint32 base[], size_t size) {
+	using namespace std;
+	std::ostringstream oss;
+
+	for(size_t i = 0; i < size; ++i){
+		oss << "0x" << hex << setw(8) << setfill('0')
+		    << base[i] << "\t"
+			<< disassemble(base[i]) << endl;
+	}
+	return oss.str();
+}
+
+/*
+ * Disassembles an array of instructions.
+ *
+ * The output consists of three columns:
+ *     - The address of the instruction (relative to the base address).
+ *     - The hex representation of the instruction.
+ *     - The disassembled instruction.
+ */
+std::string Instruction::disassemble(const uint32 base[], size_t size, const uint32 baseAddress) {
+	using namespace std;
+	ostringstream oss;
+
+	for(size_t i = 0; i < size; ++i){
+		oss 
+			<< "0x" << hex << setw(8) << setfill('0') << (baseAddress + 4*i)
+			<< "\t0x" << hex << setw(8) << setfill('0') << base[i] 
+			<< "\t" <<  disassemble(base[i]) << endl;
+	}
+	return oss.str();
+}
+
+
 
 std::string Instruction::strRs() const{
 	return reg[u.r.rs];

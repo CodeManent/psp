@@ -35,16 +35,13 @@ vector<char> readFile(const char*const path){
 	return buffer;
 }
 
-bool testDisassemble(){
 /*
-	//Allegrex cpu;
-
-
+ * Loads te IPL from the corresponding file, disassembles it and dumps it to 
+ * the console.
+ */
+bool testDisassemble(){
     vector<char> ipl(readFile("../Data/msipl.bin"));
-	//cout << Allegrex::disassemble((const uint32*)(&ipl[0]), ipl.size()*sizeof(char)/sizeof(uint32), 0xBFD00000) << endl;
-
-	cout << cpu.disassemble((const uint32 *)(&ipl[0]), ipl.size()*sizeof(char)/sizeof(uint32), 0xBFD00000) << endl;
-// */
+	cout << Instruction::disassemble((const uint32 *)(&ipl[0]), ipl.size()*sizeof(char)/sizeof(uint32), 0xBFD00000) << endl;
 	return true;
 }
 
@@ -127,7 +124,7 @@ bool runTests(){
 	std::vector<std::pair<std::string, bool (*)()>> tests = {
 		addTest(testAdditionOverflow),
 		addTest(testUnpacker),
-		addTest(testDisassemble),
+//		addTest(testDisassemble),
 		addTest(testLoadMemory)
 	};
 
