@@ -310,6 +310,11 @@ COP0::Segment COP0::getSegment(const uint32 vAddr) const{
 
 bool COP0::validateAddress(const uint32 vAddr) const {
 
+//	if vAddr_(1..0) ≠ 00b then SignalException(AddressError)
+	if(vAddr & 0x00000003){
+		return false;
+	}
+	
 	//i don't check UX because allegrex always uses 32bits
 	if(statusReg.EXL || statusReg.ERL){
 		goto kernel;
