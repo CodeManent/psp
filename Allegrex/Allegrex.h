@@ -26,10 +26,6 @@ public:
 
 	uint32 debug_registers[32];
 
-	uint32 CPR[3][32];	//coprocessor registers;
-	uint32 CCR[3][32];	//coprocessor control registers
-	uint32 COC[3];
-
 	COP0 systemCoprocessor;
 
 	Allegrex(PSP *bus);
@@ -40,14 +36,7 @@ public:
 	void execute(const uint32 &inst);
 
 	virtual void serviceRequest(const struct Request &req);
-	//void cppIsTroll(const struct Request &req);
 
-//	uint32& getGPR(const uint32 r);
-//	uint32& getCPR(const uint32 cop, const uint32 r);
-//	uint32& getCCR(const uint32 cop, const uint32 r);
-//	uint32& getCOC(const uint32 cop);
-
-//	INSTRUCTION unpack(const uint32 inst) const;
 
 	enum Register{
 		zero = 0,		//wired zero
