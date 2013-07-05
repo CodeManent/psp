@@ -39,8 +39,11 @@ class COP0: Coprocessor
 
 	struct IndexRegister;
 	struct RandomRegister;
+	struct EntryLoRegister;
 	struct ContextRegister;
+	struct PageMaskRegister;
 	struct WiredRegister;
+	struct EntryHiRegister;
 	struct StatusRegister;
 	struct CauseRegister;
 	struct PRidRegister;
@@ -53,20 +56,24 @@ class COP0: Coprocessor
 	struct PTagLoRegister;
 	struct STagLoRegister;
 
-	IndexRegister &indexReg;
-	RandomRegister &randomReg;
-	ContextRegister &contextReg;
-	WiredRegister &wiredReg;
-	StatusRegister &statusReg;
-	CauseRegister &causeReg;
-	PRidRegister &pridReg;
-	ConfigRegister &configReg;
-	WatchLoRegister &watchLoReg;
-	WatchHiRegister &watchHiReg;
+	IndexRegister    &indexReg;
+	RandomRegister   &randomReg;
+	EntryLoRegister  &entryLo0Reg;
+	EntryLoRegister  &entryLo1Reg;
+	ContextRegister  &contextReg;
+	PageMaskRegister &pageMaskReg;
+	WiredRegister    &wiredReg;
+	EntryHiRegister  &entryHiReg;
+	StatusRegister   &statusReg;
+	CauseRegister    &causeReg;
+	PRidRegister     &pridReg;
+	ConfigRegister   &configReg;
+	WatchLoRegister  &watchLoReg;
+	WatchHiRegister  &watchHiReg;
 	XContentRegister &xContentReg;
 	CacheErrRegister &cacheErrReg;
-	PTagLoRegister &ptagLoReg;
-	STagLoRegister &stagLoReg;
+	PTagLoRegister   &ptagLoReg;
+	STagLoRegister   &stagLoReg;
 
 public:
 

@@ -3,17 +3,70 @@
 #include "../TODO.h"
 #include "../BusDevice.h"
 
+/************************************************************************** p.85
+ * NOT USED because allegrex has no TBL
+ *
+ * The Index register (0) is a 32-bit, read/write register containing six bits
+ * to index an entry in the TLB.
+ *     - p: Success or failure of a TLB Probe (TLBP) instruction
+ *     - index: Specifies the TLB entry affected by TLB Read (TLBR) or
+ *              TLB Write (TLBWI) instructions.
+ */
 struct COP0::IndexRegister{
 	uint index:6;		//tlb entry affected
 	uint reserved:25;
 	uint P:1;			//1 when previous TLBP instruction was unsuccessful
 };
 
+/************************************************************************** p.86
+ * NOT USED because allegrex has no TBL
+ *
+ * The Random register (1) is a read-only reg of which 6 bits index an entry in
+ * the TLB. This reg decrements as each instruction executes.
+ *     - random: TLB Random index.
+ *     - reserved: Must be written as zeros and returns 0 when read.
+ */
 struct COP0::RandomRegister{
 	uint random:6;		// TLB Random index
 	uint reserved:26;
 };
 
+
+/************************************************************************** p.87
+ * NOT USED because allegrex has no TBL
+ *
+ * The EntryLo register consists if two registers that have identical formats:
+ *   - EntryLo0 (2) is used for even virtual pages.
+ *   - EntryLo1 (3) is used for odd virtual pages.
+ *
+ * The EntryLo regs are read/write. They hold the physical page frame number (PFN)
+ * of the TLB entry for even and odd pages, respectively, when performing TLB
+ * read and write operations.
+ *
+ *     - PFN: Page frame number; the upper bits of the physical address.
+ *     - C: Specifies the TLB page coherency attribute.
+ *     - D: Ditry. If this bit is set, the page is marked as dirty and, therefore
+ *          writable. This bit is actually a write-protect bit that software can
+ *          use to prevent alteration of data.
+ *     - V: Valid. If this bit is set, it indicates that the TLB entry is valid;
+ *          otherwise a TLBL or TLBS miss occurs.
+ *     - G: Global. If this bit is set in both Lo0 and LO1, then the processor
+ *          ignores the ASID during TLB lookup.
+ *     - Reserved: Must be written woth 0 and return 0 when read.
+ */
+struct COP0::EntryLoRegister{
+	uint G: 1;
+	uint V: 1;
+	uint D: 1;
+	uint C: 3;
+	uint PFN: 24;
+	uint reserved: 2;
+};
+
+/*******************************************************************************
+ *
+ * Context register (4)
+ */
 struct COP0::ContextRegister{
 	uint reserved:4;
 	uint BadVPN2:19;
@@ -21,11 +74,63 @@ struct COP0::ContextRegister{
 };
 
 
+/************************************************************************** p.87
+ * NOT USED because allegrex has no TBL
+ *
+ * The PageMask register (5) is a read/write reg used for reading from or
+ * writting to the TLB; it holds a comparison mask that sets the variable page
+ * size for each TLB entry.
+ *
+ *     -mask: Page comparison mask.
+ *
+ */
+struct COP0::PageMaskRegister{
+	uint reserved0 : 13;
+	uint mask : 12;
+	uint reserved1: 7;
+};
+
+ 
+/************************************************************************** p.88
+ * NOT USED because allegrex has no TBL
+ *
+ * The Wired (6) reg is a read/write reg that specifies the boundry between the
+ * wired and random entries of the TLB.
+ *
+ *     - wired: TLB Wired boundry.
+ *
+ */ 
 struct COP0::WiredRegister{
 	uint wired:6;
 	uint reserved:26;
 };
 
+/************************************************************************** p.89
+ * NOT USED because allegrex has no TBL
+ *
+ * The EntryHi (10) reg holds the high-order bits of a TLB entry for TLB read
+ * and write operations.
+ *
+ * The EntryHi reg is accessed by the TLB Probe, TLB Write Random,
+ * TLB Write Indexed and TLB Read Indexed instructions.
+ *
+ *     - VPN2: Virtual page number divided by two (maps two pages).
+ *     - ASID: Address space ID field. An 8-bit field that lets multiple
+ *             processes share the TLB; each process has a distinct mapping of
+ *             the otherwise identical virtual page numbers.
+ *
+ */ 
+struct COP0::EntryHiRegister{
+	uint8 ASID;
+	uint reserved: 5;
+	uint VPN2: 19;
+};
+
+
+/*******************************************************************************
+ *
+ * Status register (12)
+ */
 struct COP0::StatusRegister{
 	uint IE:1;		//Interrupt Enable (0=disable 1=enable)
 	uint EXL:1;		//Exception Level (0=normal 1=error)
@@ -65,32 +170,108 @@ struct COP0::CauseRegister{
 	uint BD:1;		//Last exception was on branch delay slot (0=no 1=yes)
 };
 
+/************************************************************************** p.89
+ *
+ * Processor Revision Identifier (PRId) reg (15)
+ * A read-only reg which contains information identifying the implementation and
+ * revision level of the CPU and CPU0.
+ *
+ *     - Imp: Implementation number (0x04 for R4000).
+ *     - Rev: Revision number (in major.minor format):
+ *         - 7..4: major revision number.
+ *         - 3..0: minor revision number.
+ */
 struct COP0::PRidRegister{
 	uint rev:8;			//Revision Number
 	uint imp:8;			//Implementation Number
 	uint reserved:16;
 };
 
+/************************************************************************** p.90
+ *
+ * The Config (16) reg specifies various configuration options selected on R4000
+ * processors.
+ */
 struct COP0::ConfigRegister{
 	uint KO:3;		//kseg0 coherency algorithm
-	uint CU:1;		//Update on Store Conditional (0=use tlb 1=cachable update on write)
-	uint DB:1;		//Primary Dcache line size (0=16byte 1=32byte)
-	uint IB:1;		//Primary Icache line size (0=16byte 1=32byte)
-	uint DC:3;		//Primary Dcache size = 2^(12+DC)
-	uint IC:3;		//Primary Icache size = 2^(12+IC)
+	                // (see EntryLo regs and the C field)
+	
+	uint CU:1;		//Update on Store Conditional (SC)
+	                // 0: SC uses coherency algorithm specified by TLB
+	                // 1: SC uses cachable coherent update on write
+	                
+	uint DB:1;		//Primary Dcache line size
+	                // 0: 16 bytes
+	                // 1: 32 bytes
+	
+	uint IB:1;		//Primary Icache line size
+	                // 0: 16 bytes
+	                // 1: 32 bytes
+	
+	uint DC:3;		//Primary Dcache size = 2^(12+DC) bytes. In the R$000 this
+	                // is set to 8Kbytes, in R4400 this is set to 16Kbytes.
+	                
+	uint IC:3;		//Primary Icache size = 2^(12+IC) bytes. In the R4000 this
+	                // is set to 8Kbytes, in R4400 this is set to 16Kbytes.
+	                
 	uint reserved:1;
-	uint EB:1;		//Block ordering (0=sequential 1=sub-block)
-	uint EM:1;		//ECC mode enable (0=ECC mode 1=Parity mode)
-	uint BE:1;		//BigEndianMem (0=big 1=little)
-	uint SM:1;		//Dirty shared coherent state (0=enabled 1=disabled)
-	uint SC:1;		//Secondary Cace present(0=yes 1=no)
-	uint EW:2;		//System port width (=0=64bit)
-	uint SW:1;		//Secondary cache port width(=0=128 bit)
-	uint SS:1;		//Split secondary cache (0=no 1=yes)
-	uint SB:2;		//Secondary cache line size (0=4words 1=8 2=16 3=23)
-	uint EP:4;		//Transmit data pattern
+	uint EB:1;		//Block ordering
+	                // 0:sequential
+	                // 1:sub-block
+	                
+	uint EM:1;		//ECC mode enable
+	                // 0: ECC mode enabled
+	                // 1: Parity mode emabled
+	
+	uint BE:1;		//BigEndianMem
+	                // 0: kernel and memory are little endian
+	                // 1: kenrel and memory are big endian
+	                
+	uint SM:1;		//Dirty shared coherent state
+	                // 0: Dirty Shared Coherency state is enabled
+	                // 1: Dirty shared state is disabled
+	                
+	uint SC:1;		//Secondary Cace present
+	                // 0: S-Cache present
+	                // 1: no S-cache present
+	                
+	uint EW:2;		//System port width
+	                // 0: 64 bits
+	                // 2.3.4: Reserved
+	                
+	uint SW:1;		//Secondary cache port width
+	                // 0: 128-bit data path to S-Cache
+	                // 1: Reserved
+	                
+	uint SS:1;		//Split secondary cache mode
+	                // 0: Instruction and data mixed in secondary cache (joint cache)
+	                // 1: Instruction and data separated by SCAddr(17)
+	                
+	uint SB:2;		//Secondary cache line size
+	                // 0: 4 words
+	                // 1: 8 words
+	                // 2: 16 words
+	                // 3: 32 words
+	                
+	uint EP:4;		//Transmit data pattern (pattern for write-back data)
+	                // 0: D        Doubleword every cycle
+	                // 1: DDx      2 Doublewords every 3 cycles
+	                // 2: DDxx     2 Doublewords every 4 cycles
+	                // 3: DxDx
+	                // 4: DDxxx
+	                // 5: DDxxxx
+	                // 6: DxxDxx
+	                // 7: DDxxxxxx
+	                // 8: DxxxDxxx
+	                
 	uint EC:3;		//System clock ratio
+	                // 0: processor clock divided by 2
+	                // 1: processor clock divided by 3
+	                // 2: processor clock divided by 4
+	                // 3: processor clock divided by 6 (R4400 only)
+	                // 4: processor clock divided by 8 (R4400 only)
 	uint CM:1;		//Master-Checker Mode
+	                // 1: Master/checker mode enabled
 };
 
 struct COP0::WatchLoRegister{
@@ -150,8 +331,12 @@ COP0::COP0(Allegrex &al)
 	:Coprocessor(al),
 	indexReg(reinterpret_cast<IndexRegister &>(reg[Index])),
 	randomReg(reinterpret_cast<RandomRegister &>(reg[Random])),
+	entryLo0Reg(reinterpret_cast<EntryLoRegister &>(reg[EntryLo0])),
+	entryLo1Reg(reinterpret_cast<EntryLoRegister &>(reg[EntryLo1])),
 	contextReg(reinterpret_cast<ContextRegister &>(reg[Context])),
+	pageMaskReg(reinterpret_cast<PageMaskRegister &>(reg[PageMask])),
 	wiredReg(reinterpret_cast<WiredRegister &>(reg[Wired])),
+	entryHiReg(reinterpret_cast<EntryHiRegister &>(reg[EntryHi])),
 	statusReg(reinterpret_cast<StatusRegister &>(reg[Status])),
 	causeReg(reinterpret_cast<CauseRegister &>(reg[Cause])),
 	pridReg(reinterpret_cast<PRidRegister &>(reg[PRid])),
