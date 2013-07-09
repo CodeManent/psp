@@ -63,9 +63,19 @@ struct COP0::EntryLoRegister{
 	uint reserved: 2;
 };
 
-/*******************************************************************************
+/************************************************************************ p.102
+* NOT USED because allegrex has no TBL
  *
- * Context register (4)
+ * Context register (4) is a read/write reg containing the pointer to the page
+ * table entry (PTE) array. 
+ *
+ *     - BaddVPN2: This field is written by hardware on a miss. It contains
+ *                 the virtual page number (VPN) of the most recent virtual
+ *                 address that did not have a valod translation.
+ *     - PTEBase: This field id a read/write field for use by the operating
+ *                system. It is normally written with a value that allows
+ *                the operating system to use the Context reg as a pointer
+ *                into the current PTE array in memory.
  */
 struct COP0::ContextRegister{
 	uint reserved:4;
@@ -105,6 +115,34 @@ struct COP0::WiredRegister{
 	uint reserved:26;
 };
 
+
+/************************************************************************ p.103
+ * NOT USED because allegrex has no TBL
+ *
+ * Bad Virtual address Register (BadVAddr) (8)
+ *
+ * It is a read-only reg that displays the most recent virtual address that
+ * caused one of the following exceptions:
+ *     - TLB Invalid
+ *     - TLB Modified
+ *     - TLB Refill
+ *     - Virtual Coherency Data Access
+ *     - Virtual Coherency Instruction Access
+ */
+
+/************************************************************************ p.103
+ *
+ * Count Register (9)
+ *
+ * It acts as a timer, incrementing at a constant rate -- half the maximum
+ * instruction issue rate -- whether or not an onstruction is executed, retired
+ * or any forward progress is made through the pipeline.
+ *
+ * This register can be read or written. It can be written for diagnostic
+ * purposes or system initialization; for example, to synchronize processors.
+ */
+
+
 /************************************************************************** p.89
  * NOT USED because allegrex has no TBL
  *
@@ -126,6 +164,21 @@ struct COP0::EntryHiRegister{
 	uint VPN2: 19;
 };
 
+/************************************************************************ p.103
+ *
+ * Compare Register (11)
+ *
+ * It acts as a timer (see also counter register); it maintains a stable value
+ * that does not change on its own.
+ *
+ * When the value of the Count reg equals the value of the Compare reg,
+ * interrupt bit IP(17) in the cause reg is set. This causes an interrupt as
+ * soon as the interrupt is enabled.Writing a value to thw Compare reg, as a
+ * side effect clears the timer interrupt.
+ *
+ * For diagnostic purposes, the Compare reg is read/erite. In normal use however
+ * the compare reg is write only.
+ */
 
 /*******************************************************************************
  *
