@@ -274,6 +274,17 @@ struct COP0::ConfigRegister{
 	                // 1: Master/checker mode enabled
 };
 
+/************************************************************************** p.93
+ *
+ * The Load Linked Address (LLAddr) register (174) is a read/write register
+ * that contains the physical address read by the modt Load Linked instruction.
+ *
+ * The register is for diagnostic purposes only and serves no function during
+ * normal operation.
+ *
+ * The register contains the the bits 35...4 of the physical address.
+ */
+
 struct COP0::WatchLoRegister{
 	uint W:1;		//1 = Trp on store references
 	uint R:1;		//1 = Trap on load references
@@ -313,6 +324,27 @@ struct COP0::CacheErrRegister{
 	uint ER:1;	//Type of reference (0=instruction 1=data)
 };
 
+
+
+/************************************************************************** p.93
+ * Cache Tag Registers [TagLo (28) and TagHi (29)]
+ *
+ * The TagLo and TagHi regs are 32bit read/write regs that hold either the
+ * primary cache tag and parity or the secondary cache tag and ECC during cache
+ * initialization, cache diagnostics or cache error processing. The Tag regs
+ * are wirtten by the Cache and MTC0 instructions.
+ *
+ *     - PTagLo: Physical address bits 35:12
+ *     - PState: Primary cache state
+ *     - P: Primaty tag even parity bit
+ *
+ *     - STagLo: physical address bits 35:17
+ *     - SState: Secondary cache state
+ *     - VIndex: Virtual index of the associated Primary cache line, vAddr(14:12)
+ *     - ECCL ECC for the STag, SState and VIndex fields
+ *
+ *     The HiTag reg should not be used
+ */
 struct COP0::PTagLoRegister{
 	uint P:1;		//primary tag even parity bit
 	uint reserved:5;
