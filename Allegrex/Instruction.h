@@ -167,6 +167,11 @@ public:
 	static inline int32 expandOffset(const unsigned int offset){
 		return static_cast<int32 const>(static_cast<int16 const>(offset)) << 2;
 	}
+	
+	/*
+	 * Used by branching instructins to change the PC. It handles the delay slot.
+	 */
+	static inline void changePC(uint32 target);
 };
 
 #endif
