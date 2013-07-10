@@ -19,5 +19,6 @@ std::string ANDI::disassemble() const{
 }
 
 void ANDI::execute(Allegrex &cpu) const{
+	TODO("check zero extend")
 	cpu.GPR[u.i.rt] = (cpu.GPR[u.i.rs] & static_cast<const uint32>(u.i.immediate));
 }
