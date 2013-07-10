@@ -3,6 +3,14 @@
 #pragma once
 #include "../Instruction.h"
 
+/************************************************************************ p.A-15
+ * AND rd, rs, rt
+ *
+ * The contents of the general register rs are combined with the contents of
+ * general register rt in a bit-wise logical AND operation. The result is placed
+ * into general register rd.
+ */
+ 
 class AND :
 	public Instruction
 {
