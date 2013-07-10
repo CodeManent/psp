@@ -19,6 +19,7 @@ std::string BEQ::disassemble()const{
 }
 
 void BEQ::execute(Allegrex &cpu) const{
+	TODO("Check sign-extend for immediate")
 	const int32 target = static_cast<const int32>(static_cast<const int16>(u.i.immediate)) << 2;
 	bool condition = (cpu.GPR[u.i.rs] == cpu.GPR[u.i.rt]);
 	if(condition){
