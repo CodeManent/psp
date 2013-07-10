@@ -160,6 +160,13 @@ public:
 	static inline uint32 zeroExtend(const unsigned int immediate){
 		return static_cast<const uint32>(static_cast<const uint16>(immediate));
 	}
+
+	/*
+	 * Returns the offset to be added to the PC.
+	 */
+	static inline int32 expandOffset(const unsigned int offset){
+		return static_cast<int32 const>(static_cast<int16 const>(offset)) << 2;
+	}
 };
 
 #endif

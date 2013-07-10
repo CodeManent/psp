@@ -137,7 +137,34 @@ bool testZeroExtend()
 	return true;
 }
 
+/*
+ * Checks the expandOffset method.
+ */
+bool testExpandOffset(){
+	//check a negative value
+	uint16 offset1 = 0xFFFF;
+	auto target1 = Instruction::expandOffset(offset1);
+	if(target1 > 0)
+		return false;
+	
+	if(target1/4 != static_cast<int16>(offset1))
+		return false;
+	
+	//std::cout << int16(offset1) << " -> " << target1 << std::endl;
 
+	//check a positive value
+	uint16 offset2 = 0x7FFF;
+	auto target2 = Instruction::expandOffset(offset2);
+	if(target2 < 0)
+		return false;
+	
+	if(target2/4 != offset2)
+		return false;
+	
+	//std::cout << int16(offset2) << " -> " << target2 << std::endl;
+
+	return true;
+}
 
 bool runTests(){
 	bool testResults = true;
@@ -148,7 +175,8 @@ bool runTests(){
 		addTest(testUnpacker),
 //		addTest(testDisassemble),
 		addTest(testLoadMemory),
-		addTest(testZeroExtend)
+		addTest(testZeroExtend),
+		addTest(testExpandOffset)
 	};
 
 	try{
