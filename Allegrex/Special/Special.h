@@ -1,6 +1,7 @@
 #ifndef SPECIAL_H_
 #define SPECIAL_H_
 
+#include "ADD.h"
 #include "ADDU.h"
 #include "AND.h"
 #include "NOP.h"

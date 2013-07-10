@@ -83,7 +83,7 @@ std::unique_ptr<Instruction> Allegrex::decode(const uint32 &inst) {
 		case opMADDU:
 		/*  0x1e reserved or unsupported */
 		/*  0x1f reserved or unsupported */
-		case opADD:		return retval;
+		case opADD:		retval.reset(new ADD(inst));	break;
 		case opADDU:	retval.reset(new ADDU(inst));	break;
 		case opSUB:		return retval;
 		case opSUBU:	retval.reset(new SUBU(inst));	break;
