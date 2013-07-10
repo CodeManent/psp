@@ -148,7 +148,7 @@ public:
 	 * Should be equivalent to:
 	 * (immediate_15)^16 || immediate15...0
 	 */
-	static inline uint32 signExtend(const unsigned int immediate){
+	static inline int32 signExtend(const unsigned int immediate){
 		return static_cast<const int32>(static_cast<const int16>(immediate));
 	}
 };
