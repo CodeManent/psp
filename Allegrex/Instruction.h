@@ -151,6 +151,15 @@ public:
 	static inline int32 signExtend(const unsigned int immediate){
 		return static_cast<const int32>(static_cast<const int16>(immediate));
 	}
+
+	/*
+	 * Returns the 32bit value after zero-extending the 16-bit immediate value.
+	 * Should be equivalent to:
+	 * 0^16 || immediate
+	 */
+	static inline uint32 zeroExtend(const unsigned int immediate){
+		return static_cast<const uint32>(static_cast<const uint16>(immediate));
+	}
 };
 
 #endif

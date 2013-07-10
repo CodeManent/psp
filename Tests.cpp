@@ -116,6 +116,28 @@ bool testLoadMemory()
 	return (cpu->GPR[Allegrex::at] == testVal);
 }
 
+/*
+ * Tests the zeroExtend method.
+ *
+ * We input a value that could be treated as a negative one and check the
+ * returned value.
+ */
+bool testZeroExtend()
+{
+	uint16 value = 0xFFFF; //-1
+	
+	uint32 result = Instruction::zeroExtend(value);
+
+	if(result & 0xFFFF0000)
+		return false;
+	
+	if(result != value)
+		return false;
+	
+	return true;
+}
+
+
 
 bool runTests(){
 	bool testResults = true;
@@ -125,7 +147,8 @@ bool runTests(){
 		addTest(testAdditionOverflow),
 		addTest(testUnpacker),
 //		addTest(testDisassemble),
-		addTest(testLoadMemory)
+		addTest(testLoadMemory),
+		addTest(testZeroExtend)
 	};
 
 	try{
