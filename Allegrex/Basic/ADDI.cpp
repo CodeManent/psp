@@ -19,9 +19,9 @@ std::string ADDI::disassemble() const{
 }
 
 void ADDI::execute(Allegrex &cpu) const{
-	const int32 signExtended = static_cast<const int32>(static_cast<const int16>(u.i.immediate));
+	const int32 signExtended = signExtend(u.i.immediate);
 
-	if(additionOverflows(cpu.SGPR[u.r.rs], signExtended)){
+	if(additionOverflows(cpu.SGPR[u.i.rs], signExtended)){
 		//raise integer overflow exception
 		TODO("raise integer overflow exception")
 

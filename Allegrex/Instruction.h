@@ -142,6 +142,15 @@ public:
 	std::string strUnsignedImmediate() const;
 	std::string strHexImmediate() const;
 	static bool additionOverflows(int32 a, int32 b);
+
+	/*
+	 * Returns the 32bit value after sign-extending the 16-bit immediate.
+	 * Should be equivalent to:
+	 * (immediate_15)^16 || immediate15...0
+	 */
+	static inline uint32 signExtend(const unsigned int immediate){
+		return static_cast<const int32>(static_cast<const int16>(immediate));
+	}
 };
 
 #endif
