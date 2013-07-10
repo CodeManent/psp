@@ -6,6 +6,7 @@
 #include "ADDIU.h"
 #include "ANDI.h"
 #include "BEQ.h"
+#include "BEQL.h"
 #include "BGTZ.h"
 #include "BLEZ.h"
 #include "BNE.h"
