@@ -22,5 +22,5 @@ std::string JAL::disassemble() const{
 
 void JAL::execute(Allegrex &cpu) const{
 	cpu.GPR[31] = cpu.PC + 8;
-	cpu.PC = (cpu.PC & 0xF0000000) | (u.j.target << 2);
+	cpu.PC = findTarget(cpu.PC + 4);
 }

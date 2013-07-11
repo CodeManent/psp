@@ -19,5 +19,5 @@ std::string J::disassemble() const{
 }
 
 void J::execute(Allegrex &cpu) const{
-	cpu.PC = (cpu.PC & 0xF0000000) | (u.j.target << 2);
+	cpu.PC = findTarget(cpu.PC + 4);
 }
