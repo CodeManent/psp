@@ -6,6 +6,8 @@
 #include "AND.h"
 #include "CLO.h"
 #include "CLZ.h"
+#include "DIV.h"
+#include "DIVU.h"
 #include "NOP.h"
 #include "NOR.h"
 #include "JALR.h"

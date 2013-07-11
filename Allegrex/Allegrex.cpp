@@ -77,8 +77,8 @@ std::unique_ptr<Instruction> Allegrex::decode(const uint32 &inst) {
 		case opCLO: retval.reset(new CLO(inst));	break;
 		case opMULT:retval.reset(new MULT(inst));	break;
 		case opMULTU:retval.reset(new MULTU(inst));	break;
-		case opDIV:
-		case opDIVU:
+		case opDIV: retval.reset(new DIV(inst));	break;
+		case opDIVU:retval.reset(new DIVU(inst));	break;
 		case opMADD:
 		case opMADDU:
 		/*  0x1e reserved or unsupported */
