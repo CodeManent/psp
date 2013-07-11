@@ -91,7 +91,7 @@ std::string Instruction::strSa() const{
 std::string Instruction::strTarget() const{
 	std::stringstream ss;
 
-	ss << "0x" << std::hex << std::setw(2) << u.j.target;
+	ss << "0x" << std::hex << std::setw(2) << (u.j.target << 2);
 
 	return ss.str();
 }
@@ -99,19 +99,21 @@ std::string Instruction::strTarget() const{
 std::string Instruction::strOffset() const{
 	std::stringstream ss;
 
-    ss << static_cast<const int32>(static_cast<const int16>(u.i.immediate));
+    ss << expandOffset();
 
 	return ss.str();
 }
 
 std::string Instruction::strSignedImmediate() const{
-	return strOffset();
+	std::stringstream ss;
+	ss << signExtendImm();
+	return ss.str();
 }
 
 std::string Instruction::strUnsignedImmediate() const{
 	std::stringstream ss;
 
-	ss << static_cast<const uint32>(static_cast<const int32>(static_cast<int16>(u.i.immediate)));
+	ss << zeroExtendImm();
 
 	return ss.str();
 }

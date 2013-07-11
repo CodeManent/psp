@@ -13,7 +13,7 @@ LW::~LW(void)
 std::string LW::disassemble() const{
 	std::stringstream ss;
 
-	ss << "lw\t" << strRt() << ", " << strRs() << "(" << strOffset()  << ")";
+	ss << "lw\t" << strRt() << ", " << strRs() << "(" << strSignedImmediate()  << ")";
 
 	return ss.str();
 }
