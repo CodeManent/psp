@@ -19,9 +19,10 @@ std::string BNE::disassemble() const{
 }
 
 void BNE::execute(Allegrex &cpu) const{
-	const int32 target = static_cast<const int32>(static_cast<const int16>(u.i.immediate)) << 2;
+	const int32 target = expandOffset(u.i.immediate);
 	bool condition = (cpu.GPR[u.i.rs] != cpu.GPR[u.i.rt]);
 	if(condition){
-		cpu.PC += target;
+		changePC(cpu, target + 4);
 	}
 }
+
