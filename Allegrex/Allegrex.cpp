@@ -69,8 +69,8 @@ std::unique_ptr<Instruction> Allegrex::decode(const uint32 &inst) {
 		case opSYNC: break;
 		case opMFHI: retval.reset(new MFHI(inst));	break;
 		case opMTHI: retval.reset(new MTHI(inst));	break;
-		case opMFLO:
-		case opMTLO:
+		case opMFLO: retval.reset(new MFLO(inst));	break;
+		case opMTLO: retval.reset(new MTLO(inst));	break;
 		/*  0x14 reserved or unsupported */
 		/*  0x15 reserved or unsupported */
 		case opCLZ:
