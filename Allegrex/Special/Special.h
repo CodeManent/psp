@@ -4,6 +4,7 @@
 #include "ADD.h"
 #include "ADDU.h"
 #include "AND.h"
+#include "CLZ.h"
 #include "NOP.h"
 #include "NOR.h"
 #include "JALR.h"
