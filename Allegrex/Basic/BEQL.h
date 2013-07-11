@@ -38,14 +38,13 @@ public:
 		return ss.str();
 	}
 	virtual void execute(Allegrex &cpu) const{
-		TODO("Check sign-extend for immediate")
-		const int32 target = static_cast<const int32>(static_cast<const int16>(u.i.immediate)) << 2;
+		const int32 target = expandOffset(u.i.immediate);
+
 		bool condition = (cpu.GPR[u.i.rs] == cpu.GPR[u.i.rt]);
 		if(condition){
-			cpu.PC += target;
-		}
-		else{
-			TODO("Nullify Current instruction.")
+			// + 4 because the target address is computed based on the PC of
+			// the delay slot.
+			changePC(cpu, target + 4, true);
 		}
 	}
 };
