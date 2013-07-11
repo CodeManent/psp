@@ -19,5 +19,5 @@ std::string ORI::disassemble() const{
 }
 
 void ORI::execute(Allegrex &cpu) const{
-	cpu.GPR[u.i.rt] = (cpu.GPR[u.i.rs] | static_cast<const uint32>(u.i.immediate));
+	cpu.GPR[u.i.rt] = (cpu.GPR[u.i.rs] | zeroExtend(u.i.immediate));
 }
