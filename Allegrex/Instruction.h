@@ -172,6 +172,14 @@ public:
 	 * Used by branching instructins to change the PC. It handles the delay slot.
 	 */
 	static void changePC(Allegrex &cpu, const uint32 target, const bool likely = false);
+	
+	/*
+	 * Computes the target address of a jump instruction.
+	 *  ddress = PC_(31...28) || target || 00
+	 */
+	inline uint32 findTarget(const uint32 PC) const{
+		return (PC & 0xF0000000) | (static_cast<uint32>(u.j.target) << 2);
+	}
 };
 
 #endif
