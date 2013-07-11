@@ -19,5 +19,5 @@ std::string OR::disassemble() const{
 }
 
 void OR::execute(Allegrex &cpu) const{
-	cpu.GPR[u.r.rd] = cpu.GPR[u.r.rs] & cpu.GPR[u.r.rt];
+	cpu.GPR[u.r.rd] = cpu.GPR[u.r.rs] | cpu.GPR[u.r.rt];
 }

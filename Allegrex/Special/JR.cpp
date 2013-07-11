@@ -20,5 +20,5 @@ std::string JR::disassemble() const{
 }
 
 void JR::execute(Allegrex &cpu) const{
-	cpu.PC = cpu.GPR[u.r.rs];
+	changePC(cpu, cpu.GPR[u.r.rs]);
 }

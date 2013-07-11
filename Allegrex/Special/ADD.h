@@ -26,14 +26,14 @@ public:
 	virtual std::string disassemble() const{
 		std::stringstream ss;
 
-		ss << "addu\t" << strRd() << ", " << strRs() << ", " << strRt();
+		ss << "add\t" << strRd() << ", " << strRs() << ", " << strRt();
 
 		return ss.str();
 	}
 	
 	virtual void execute(Allegrex &cpu) const{
 		TODO("Check for integer overflow");
-		cpu.GPR[u.r.rd] = cpu.GPR[u.r.rs] + cpu.GPR[u.r.rt];
+		cpu.SGPR[u.r.rd] = cpu.SGPR[u.r.rs] + cpu.SGPR[u.r.rt];
 	}
 };
 
