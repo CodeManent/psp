@@ -171,7 +171,7 @@ public:
 	/*
 	 * Used by branching instructins to change the PC. It handles the delay slot.
 	 */
-	static inline void changePC(uint32 target);
+	static void changePC(Allegrex &cpu, const uint32 target, const bool likely = false);
 };
 
 #endif

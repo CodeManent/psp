@@ -144,7 +144,10 @@ bool Instruction::additionOverflows(int32 lhs, int32 rhs){
 	return false;
 }
 
-void Instruction::changePC(Allegrex& cpu, const uint32 target){
-	TODO("handle the delay slot")
-	cpu.PC = target;
+void Instruction::changePC(Allegrex& cpu, const uint32 target, const bool likely){
+	if(likely)
+		cpu.PC = target;
+	else{
+		TODO("handle the delay slot")
+	}
 }
