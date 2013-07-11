@@ -14,6 +14,7 @@
 #include "MFLO.h"
 #include "MTHI.h"
 #include "MTLO.h"
+#include "MULT.h"
 #include "OR.h"
 #include "SLL.h"
 #include "SLLV.h"
