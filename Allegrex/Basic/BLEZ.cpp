@@ -19,9 +19,9 @@ std::string BLEZ::disassemble() const{
 }
 
 void BLEZ::execute(Allegrex &cpu) const{
-	const int32 target = static_cast<const int32>(static_cast<const int16>(u.i.immediate)) << 2;
-	bool condition = ((cpu.GPR[u.i.rs] &0x80000000) == 0x80000000) || (cpu.GPR[u.i.rt] == 0);
+	const int32 target = expandOffset(u.i.immediate);
+	bool condition = (cpu.SGPR[u.i.rs] <= 0);
 	if(condition){
-		cpu.PC += target;
+		changePC(cpu, target +4);
 	}
 }

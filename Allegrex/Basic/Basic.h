@@ -9,6 +9,7 @@
 #include "BEQL.h"
 #include "BGTZ.h"
 #include "BLEZ.h"
+#include "BLEZL.h"
 #include "BNE.h"
 #include "J.h"
 #include "JAL.h"

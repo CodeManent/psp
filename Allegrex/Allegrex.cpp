@@ -123,8 +123,8 @@ std::unique_ptr<Instruction> Allegrex::decode(const uint32 &inst) {
 	case opCOP1:
 	case opVFPU2:
 	case opBEQL:
-	case opBNEL:
-	case opBLEZL:
+	case opBNEL: break;
+	case opBLEZL:	retval.reset(new BLEZL(inst));	break;
 	case opBGTZL:
 	case opVFPU0:
 	case opVFPU1:
