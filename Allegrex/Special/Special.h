@@ -14,6 +14,7 @@
 #include "SLT.h"
 #include "SLTU.h"
 #include "SRA.h"
+#include "SUB.h"
 #include "SUBU.h"
 #include "XOR.h"
 
