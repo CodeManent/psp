@@ -8,6 +8,8 @@
 #include "NOR.h"
 #include "JALR.h"
 #include "JR.h"
+#include "MFHI.h"
+#include "MTHI.h"
 #include "OR.h"
 #include "SLL.h"
 #include "SLLV.h"
