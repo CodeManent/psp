@@ -148,8 +148,8 @@ public:
 	 * Should be equivalent to:
 	 * (immediate_15)^16 || immediate15...0
 	 */
-	static inline int32 signExtend(const unsigned int immediate){
-		return static_cast<const int32>(static_cast<const int16>(immediate));
+	inline int32 signExtendImm() const {
+		return static_cast<const int32>(static_cast<const int16>(u.i.immediate));
 	}
 
 	/*
@@ -157,15 +157,15 @@ public:
 	 * Should be equivalent to:
 	 * 0^16 || immediate
 	 */
-	static inline uint32 zeroExtend(const unsigned int immediate){
-		return static_cast<const uint32>(static_cast<const uint16>(immediate));
+	inline uint32 zeroExtendImm() const {
+		return static_cast<const uint32>(static_cast<const uint16>(u.i.immediate));
 	}
 
 	/*
 	 * Returns the offset to be added to the PC.
 	 */
-	static inline int32 expandOffset(const unsigned int offset){
-		return static_cast<int32 const>(static_cast<int16 const>(offset)) << 2;
+	inline int32 expandOffset() const{
+		return static_cast<int32 const>(static_cast<int16 const>(u.i.immediate)) << 2;
 	}
 	
 	/*

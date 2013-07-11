@@ -19,7 +19,7 @@ std::string SLTIU::disassemble()const{
 }
 
 void SLTIU::execute(Allegrex &cpu) const{
-	const uint32 signExtended = static_cast<const uint32>(signExtend(u.i.immediate));
+	const uint32 signExtended = static_cast<const uint32>(signExtendImm());
 
 	cpu.GPR[u.i.rt] = (cpu.GPR[u.i.rs] < signExtended);
 }

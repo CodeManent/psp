@@ -116,56 +116,6 @@ bool testLoadMemory()
 	return (cpu->GPR[Allegrex::at] == testVal);
 }
 
-/*
- * Tests the zeroExtend method.
- *
- * We input a value that could be treated as a negative one and check the
- * returned value.
- */
-bool testZeroExtend()
-{
-	uint16 value = 0xFFFF; //-1
-	
-	uint32 result = Instruction::zeroExtend(value);
-
-	if(result & 0xFFFF0000)
-		return false;
-	
-	if(result != value)
-		return false;
-	
-	return true;
-}
-
-/*
- * Checks the expandOffset method.
- */
-bool testExpandOffset(){
-	//check a negative value
-	uint16 offset1 = 0xFFFF;
-	auto target1 = Instruction::expandOffset(offset1);
-	if(target1 > 0)
-		return false;
-	
-	if(target1/4 != static_cast<int16>(offset1))
-		return false;
-	
-	//std::cout << int16(offset1) << " -> " << target1 << std::endl;
-
-	//check a positive value
-	uint16 offset2 = 0x7FFF;
-	auto target2 = Instruction::expandOffset(offset2);
-	if(target2 < 0)
-		return false;
-	
-	if(target2/4 != offset2)
-		return false;
-	
-	//std::cout << int16(offset2) << " -> " << target2 << std::endl;
-
-	return true;
-}
-
 bool runTests(){
 	bool testResults = true;
 
@@ -174,9 +124,7 @@ bool runTests(){
 		addTest(testAdditionOverflow),
 		addTest(testUnpacker),
 //		addTest(testDisassemble),
-		addTest(testLoadMemory),
-		addTest(testZeroExtend),
-		addTest(testExpandOffset)
+		addTest(testLoadMemory)
 	};
 
 	try{

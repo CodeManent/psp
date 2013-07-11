@@ -19,7 +19,7 @@ std::string ADDIU::disassemble() const{
 }
 
 void ADDIU::execute(Allegrex &cpu)const{
-	const uint32 signExtended = signExtend(u.i.immediate);
+	const uint32 signExtended = signExtendImm();
 
 	cpu.GPR[u.i.rt] = cpu.GPR[u.r.rs] + signExtended;
 }

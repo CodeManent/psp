@@ -19,7 +19,7 @@ std::string LW::disassemble() const{
 }
 
 void LW::execute(Allegrex &cpu) const{
-	const uint32 vAddr = signExtend(u.i.immediate) + cpu.GPR[u.i.rs];
+	const uint32 vAddr = signExtendImm() + cpu.GPR[u.i.rs];
 	uint32 mem = cpu.systemCoprocessor.loadMemory32(vAddr);
 	cpu.GPR[u.i.rt] = mem;
 }

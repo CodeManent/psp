@@ -19,7 +19,7 @@ std::string ADDI::disassemble() const{
 }
 
 void ADDI::execute(Allegrex &cpu) const{
-	const int32 signExtended = signExtend(u.i.immediate);
+	const int32 signExtended = signExtendImm();
 
 	if(additionOverflows(cpu.SGPR[u.i.rs], signExtended)){
 		//raise integer overflow exception

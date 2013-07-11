@@ -19,5 +19,5 @@ std::string XORI::disassemble() const{
 }
 
 void XORI::execute(Allegrex &cpu) const{
-	cpu.GPR[u.i.rt] = (cpu.GPR[u.i.rs] ^ zeroExtend(u.i.immediate));
+	cpu.GPR[u.i.rt] = (cpu.GPR[u.i.rs] ^ zeroExtendImm());
 }

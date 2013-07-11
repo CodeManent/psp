@@ -18,7 +18,7 @@ std::string SLTI::disassemble() const{
 }
 
 void SLTI::execute(Allegrex &cpu) const{
-	const int32 signExtended = signExtend(u.i.immediate);
+	const int32 signExtended = signExtendImm();
 
 	cpu.GPR[u.i.rt] = (cpu.SGPR[u.i.rs] < signExtended);
 }

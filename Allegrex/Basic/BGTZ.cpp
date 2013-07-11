@@ -19,7 +19,7 @@ std::string BGTZ::disassemble() const{
 }
 
 void BGTZ::execute(Allegrex &cpu) const{
-	const int32 target = expandOffset(u.i.immediate);
+	const int32 target = expandOffset();
 	bool condition = (cpu.SGPR[u.i.rs] > 0);
 	if(condition){
 		changePC(cpu, target + 4);

@@ -38,7 +38,7 @@ public:
 		return ss.str();
 	}
 	virtual void execute(Allegrex &cpu) const{
-		const int32 target = expandOffset(u.i.immediate);
+		const int32 target = expandOffset();
 
 		bool condition = (cpu.GPR[u.i.rs] == cpu.GPR[u.i.rt]);
 		if(condition){
