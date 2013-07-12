@@ -18,10 +18,10 @@ std::string BGTZ::disassemble() const{
 	return ss.str();
 }
 
-void BGTZ::execute(Allegrex &cpu) const{
-	const int32 target = expandOffset();
+void BGTZ::execute(Allegrex &cpu) const{	
 	bool condition = (cpu.SGPR[u.i.rs] > 0);
 	if(condition){
+		const int32 target = cpu.PC + expandOffset();
 		changePC(cpu, target + 4);
 	}
 }

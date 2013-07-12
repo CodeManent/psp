@@ -8,6 +8,7 @@
 #include "BEQ.h"
 #include "BEQL.h"
 #include "BGTZ.h"
+#include "BGTZL.h"
 #include "BLEZ.h"
 #include "BLEZL.h"
 #include "BNE.h"

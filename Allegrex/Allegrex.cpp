@@ -80,7 +80,7 @@ std::unique_ptr<Instruction> Allegrex::decode(const uint32 &inst) {
 		case opDIV: retval.reset(new DIV(inst));	break;
 		case opDIVU:retval.reset(new DIVU(inst));	break;
 		case opMADD:
-		case opMADDU:
+		case opMADDU: break;
 		/*  0x1e reserved or unsupported */
 		/*  0x1f reserved or unsupported */
 		case opADD:		retval.reset(new ADD(inst));	break;
@@ -121,11 +121,11 @@ std::unique_ptr<Instruction> Allegrex::decode(const uint32 &inst) {
 	TODO("complete regular instructions")
 	case opCOP0:
 	case opCOP1:
-	case opVFPU2:
-	case opBEQL:
+	case opVFPU2:break;
+	case opBEQL:	retval.reset(new BEQL(inst));	break;
 	case opBNEL: break;
 	case opBLEZL:	retval.reset(new BLEZL(inst));	break;
-	case opBGTZL:
+	case opBGTZL:	retval.reset(new BGTZL(inst));	break;
 	case opVFPU0:
 	case opVFPU1:
 	/*  0x1a reserved or unsupported */

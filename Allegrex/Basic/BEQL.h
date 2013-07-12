@@ -38,12 +38,11 @@ public:
 		return ss.str();
 	}
 	virtual void execute(Allegrex &cpu) const{
-		const int32 target = expandOffset();
-
 		bool condition = (cpu.GPR[u.i.rs] == cpu.GPR[u.i.rt]);
 		if(condition){
 			// + 4 because the target address is computed based on the PC of
 			// the delay slot.
+			const int32 target = cpu.PC +  expandOffset();
 			changePC(cpu, target + 4, true);
 		}
 	}
