@@ -12,6 +12,7 @@
 #include "BLEZ.h"
 #include "BLEZL.h"
 #include "BNE.h"
+#include "BNEL.h"
 #include "J.h"
 #include "JAL.h"
 #include "LUI.h"
