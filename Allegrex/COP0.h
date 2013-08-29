@@ -134,6 +134,7 @@ public:
 	COP0(Allegrex &al, PSP *bus);
 	virtual ~COP0(void);
 
+	long step();
 	void reset();				//Reset Exception Processing
 	void cacheError();			//Cache Error Exception Processing
 	void NMI();					//Soft Reset and NMI Exception Processing

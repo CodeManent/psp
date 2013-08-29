@@ -4,6 +4,8 @@
 #include "../BusDevice.h"
 
 #include <stdexcept>
+#include <iostream>
+#include <iomanip>
 
 /************************************************************************** p.85
  * NOT USED because allegrex has no TBL
@@ -450,6 +452,27 @@ COP0::COP0(Allegrex &al, PSP *bus)
 COP0::~COP0(void)
 {
 }
+
+/*
+ * Fetch the instruction from the memory[PC]
+ * Execute the instruction.
+ * 
+ * Handle delay slot and anything other needed.
+ * NOT COMPLETED
+ */
+long COP0::step(){
+	const uint32 inst = loadMemory32(cpu.PC);
+	try{
+		cpu.execute(inst);
+	}
+	catch(const std::runtime_error &re){
+		std::cerr << "0x" << std::setw(8) << std::setfill('0') << cpu.PC
+		<< re.what() << std::endl;
+	}
+
+	return 1;
+}
+
 
 TODO("method parameters")
 void COP0::reset(){

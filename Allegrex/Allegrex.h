@@ -32,7 +32,8 @@ public:
 	~Allegrex(void);
 
 	static std::unique_ptr<Instruction> decode(const uint32 &inst);
-
+	
+	long step();
 	void execute(const uint32 &inst);
 
 	virtual void serviceRequest(const struct Request &req);

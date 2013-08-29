@@ -174,6 +174,14 @@ std::unique_ptr<Instruction> Allegrex::decode(const uint32 &inst) {
 }
 
 
+/*
+ * The execution begins from the system coprocessor.
+ *
+ * It is supposed to return the time took to execute what is executed.
+ */
+long Allegrex::step(){
+	return systemCoprocessor.step();
+}
 
 void Allegrex::execute(const uint32 &inst){
 	std::unique_ptr<Instruction> i = decode(inst);

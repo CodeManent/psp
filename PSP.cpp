@@ -30,11 +30,13 @@ void PSP::run(){
 		0,
 		0
 	};
-
 	cpu->serviceRequest(r);
-	static_cast<Allegrex *>(cpu)->execute(0x3ff9983f);
-//	while(true){
-//	}
+
+	//static_cast<Allegrex *>(cpu)->execute(0x3ff9983f);
+	while(true){
+		static_cast<Allegrex *>(cpu)->step();
+		forwardRequests();
+	}
 }
 
 /*
