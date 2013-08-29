@@ -3,8 +3,9 @@
 #pragma once
 
 #include "Coprocessor.h"
+#include "../BusDevice.h"
 
-class COP0: Coprocessor
+class COP0: public Coprocessor, public BusDevice
 {
 	// *****THERE IS NO TLB IN ALLEGREX*****
 
@@ -130,7 +131,7 @@ public:
 		VCED = 31	//Virual Coherency Exception data
 	};
 
-	COP0(Allegrex &al);
+	COP0(Allegrex &al, PSP *bus);
 	virtual ~COP0(void);
 
 	void reset();				//Reset Exception Processing
@@ -159,6 +160,7 @@ public:
 	bool dataPending;
 
 	void receiveData(uint32 data);
+	virtual void serviceRequest(const struct BusDevice::Request &req);
 };
 
 #endif

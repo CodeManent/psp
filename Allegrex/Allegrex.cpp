@@ -10,7 +10,6 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <memory>
 
@@ -22,7 +21,7 @@ Allegrex::Allegrex(PSP *bus):
 		PC(0xBFC00000),
 		HI(0),
 		LO(0),
-		systemCoprocessor(*this)
+		systemCoprocessor(*this, bus)
 {
 	GPR[sp] = 0x09F70000;
 	GPR[s8] = 0x08000000;
@@ -200,20 +199,10 @@ Allegrex::INSTRUCTION Allegrex::unpack(const uint32 inst) const
 }
 */
 
+/*
+ * Actually the system coprocessor is connected to the bus. Allegrex is just
+ * the interface. So we forward every request to the system coprosessor.
+ */
 void Allegrex::serviceRequest(const struct Request &req){
-	switch(req.function){
-		case BusDevice::Reset:
-			systemCoprocessor.reset();
-			break;
-
-		case BusDevice::Reply:
-			systemCoprocessor.receiveData(req.param1);
-			break;
-			//systemCoprocessor.
-
-		case BusDevice::Read:
-		case BusDevice::Write:
-		default:
-			throw std::logic_error("Allegrex: function not recognised");
-	}
+	systemCoprocessor.serviceRequest(req);
 }

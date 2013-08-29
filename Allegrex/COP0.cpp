@@ -3,6 +3,8 @@
 #include "../TODO.h"
 #include "../BusDevice.h"
 
+#include <stdexcept>
+
 /************************************************************************** p.85
  * NOT USED because allegrex has no TBL
  *
@@ -412,8 +414,9 @@ struct COP0::STagLoRegister{
 	uint STagLo:19;	//Physical address bits 35:17
 };
 
-COP0::COP0(Allegrex &al)
+COP0::COP0(Allegrex &al, PSP *bus)
 	:Coprocessor(al),
+	BusDevice(bus),
 	indexReg(reinterpret_cast<IndexRegister &>(reg[Index])),
 	randomReg(reinterpret_cast<RandomRegister &>(reg[Random])),
 	entryLo0Reg(reinterpret_cast<EntryLoRegister &>(reg[EntryLo0])),
@@ -709,6 +712,26 @@ void COP0::receiveData(uint32 data){
 	{
 		receivedData = data;
 		dataPending = false;
+	}
+}
+
+
+void COP0::serviceRequest(const struct BusDevice::Request &req)
+{
+	switch(req.function){
+		case BusDevice::Reset:
+			reset();
+			break;
+
+		case BusDevice::Reply:
+			receiveData(req.param1);
+			break;
+			//systemCoprocessor.
+
+		case BusDevice::Read:
+		case BusDevice::Write:
+		default:
+			throw std::logic_error("Allegrex: function not recognised");
 	}
 }
 
