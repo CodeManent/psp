@@ -18,10 +18,10 @@ class MainMemory:
 	
 	// mapping oh=f the physical memory
 	MapEntry memoryMap[3] = {
-		// start   , end       , vector(size, value) , description
-		{0x00000000, 0x001fffff, {0x00200000 >> 2, 0}, "ME internal memory"},
-		{0x08000000, 0x09ffffff, {0x02000000 >> 2, 0}, "Main Memory"},
-		{0x1fc00000, 0x1fcfffff, {0x00100000 >> 2, 0}, "Hardware exception vectors"}
+		// start   , end       , vector(size) , description
+		{0x00000000, 0x001fffff, std::vector<uint32>(0x00200000 >> 2), "ME internal memory"},
+		{0x08000000, 0x09ffffff, std::vector<uint32>(0x02000000 >> 2), "Main Memory"},
+		{0x1fc00000, 0x1fcfffff, std::vector<uint32>(0x00100000 >> 2), "Hardware exception vectors"}
 	};
 
 	//MapEntry ramUsage[3];
