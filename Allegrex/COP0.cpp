@@ -461,15 +461,22 @@ COP0::~COP0(void)
  * NOT COMPLETED
  */
 long COP0::step(){
-	const uint32 inst = loadMemory32(cpu.PC);
 	try{
+		const uint32 inst = loadMemory32(cpu.PC);
+		std::cout << std::hex << std::setw(8)
+			<< "PC = 0x" << cpu.PC
+			<< '\t' << Instruction::disassemble(inst)
+			<< std::endl;
 		cpu.execute(inst);
+		cpu.PC += 1<<2;
 	}
 	catch(const std::runtime_error &re){
-		std::cerr << "0x" << std::setw(8) << std::setfill('0') << cpu.PC
-		<< re.what() << std::endl;
-	}
+		std::cerr
+			<< "0x" << std::setw(8) << std::setfill('0') << std::hex << cpu.PC
+			<< '\t' << re.what() << std::endl;
 
+		throw;
+	}
 	return 1;
 }
 
@@ -665,7 +672,7 @@ uint32 COP0::addressTranslation(const uint32 vAddr, bool &cachable) const{
 				return vAddr;
 
 			default:
-				throw("Bad segment");
+				throw("COP0: Bad segment");
 		}
 	}
 	else{
@@ -685,7 +692,7 @@ uint32 COP0::loadMemory32(const uint32 vAddr){
 //	cpu.GPR[u.i.rt] = mem;
 
 	if(!validateAddress(vAddr)){
-		throw("Address error exception");
+		throw std::runtime_error("COP0: Address error exception");
 	}
 	
 	bool cachable;
@@ -701,7 +708,7 @@ uint32 COP0::loadMemory32(const uint32 vAddr){
 		const uint32 word = vAddr & 0x0000001f;
 		dCacheLine &dcl = dCache[line];
 		*/
-		TODO("Finish cache implementation")
+		TODO("COP0: Finish cache implementation")
 		return 0;
 	}
 	else{
@@ -754,7 +761,7 @@ void COP0::serviceRequest(const struct BusDevice::Request &req)
 		case BusDevice::Read:
 		case BusDevice::Write:
 		default:
-			throw std::logic_error("Allegrex: function not recognised");
+			throw std::logic_error("COP0: function not recognised");
 	}
 }
 
