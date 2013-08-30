@@ -4,14 +4,32 @@
 
 #include "BusDevice.h"
 #include "IntTypes.h"
+#include <vector>
 
 class MainMemory:
 	public BusDevice
 {
-	uint32 memory[8*1024*1024]; //32MB
+	struct MapEntry{
+		uint32 start;				// Starting adress
+		uint32 end;					// ending address
+		std::vector<uint32> data;	// Size of the 
+		const char* description;	// Text about the memory map entry
+	};
+	
+	// mapping oh=f the physical memory
+	MapEntry memoryMap[3] = {
+		// start   , end       , vector(size, value) , description
+		{0x00000000, 0x001fffff, {0x00200000 >> 2, 0}, "ME internal memory"},
+		{0x08000000, 0x09ffffff, {0x02000000 >> 2, 0}, "Main Memory"},
+		{0x1fc00000, 0x1fcfffff, {0x00100000 >> 2, 0}, "Hardware exception vectors"}
+	};
+
+	//MapEntry ramUsage[3];
 
 //Public for testing purposes	
 public:
+	const uint32& getCell(const uint32 addr) const;
+	uint32& getCell(const uint32 addr);
 	uint32 read(const uint32 addr) const;
 	void write(const uint32 addr, const uint32 data);
 public:
