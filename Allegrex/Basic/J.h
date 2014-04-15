@@ -4,6 +4,13 @@
 
 #include "../Instruction.h"
 
+/********************************************************************** p. A-77
+ * j target
+ *
+ * The 26-bit target address is shifted left two bits and combined with high
+ * order bits of the address of the delay slot. The program unconditionally
+ * jumps to this calculated address with a delay of one instruction.
+ */
 class J :
 	public Instruction
 {

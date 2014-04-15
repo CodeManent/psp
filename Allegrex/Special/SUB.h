@@ -30,7 +30,9 @@ public:
 	}
 	
 	virtual void execute(Allegrex &cpu) const{
-		TODO("Check for integer overflow");
+		if(additionOverflows(cpu.SGPR[u.r.rs], -cpu.SGPR[u.r.rt]))
+			cpu.systemCoprocessor.raiseException(COP0::Ov);
+
 		cpu.SGPR[u.r.rd] = cpu.SGPR[u.r.rs] - cpu.SGPR[u.r.rt];
 	}
 };

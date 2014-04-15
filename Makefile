@@ -1,6 +1,7 @@
 ## Build flags for all targets
 #
-CXXFLAGS += -g -Wall -Werror -std=c++0x #-DTEST_
+CXX = g++-4.8
+CXXFLAGS += -g -pedantic -Wall -Werror -Wextra -std=c++11
 CC       = $(CXX)
 CFLAGS   = $(CXXFLAGS)
 LDFLAGS +=
@@ -11,24 +12,25 @@ BINDIR=../bin
 # custom rules
 
 #compilation rules
-$(BINDIR)/%.o: %.cpp
-	@$(CXX) $(CXXFLAGS) -c -o $@ $<
+$(BINDIR)/%.o: %.cpp $(BINDIR)/%.d
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(BINDIR)/%.o: %.cc
-	@$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 	
 $(BINDIR)/%.o: %.c
-	@$(CC) $(CXXFLAGS)  -c -o $@ $<
+	$(CC) $(CXXFLAGS)  -c -o $@ $<
 
 #Makefile driver creation rules
+# don't show the d file creation command
 $(BINDIR)/%.d: %.c
-	@$(CC) $(CXXFLAGS)  $< -MM -MF $@
+	@$(CC) $(CXXFLAGS) $< -MM -MF $@ 
 
 $(BINDIR)/%.d: %.cpp
-	@$(CXX) $(CXXFLAGS)   $< -MM -MF $@
+	@$(CXX) $(CXXFLAGS) $< -MM -MF $@ -MT '$(@:%.d=%.o)'
 
 $(BINDIR)/%.d: %.cc
-	@$(CXX) $(CXXFLAGS)   $< -MM -MF $@
+	@$(CXX) $(CXXFLAGS) $< -MM -MF $@ -MT '$(@:%.d=%.o)'
 
 # Standard things
 .PHONY: all
@@ -51,6 +53,15 @@ clean:
 .PHONY: run
 run: $(TARGET_BIN)
 	./$(TARGET_BIN)
+
+.PHONY: test
+test: $(TARGET_BIN)
+	./$(TARGET_BIN) --test
+
+# Check the code using cppcheck.
+.PHONY: check
+check:
+	cppcheck --enable=all -q .
 
 # Prevent make from removing any build targets, including intermediate ones
 .SECONDARY: $(CLEAN)

@@ -7,7 +7,8 @@
 #include "../IntTypes.h"
 
 #include <string>
-
+#include <sstream>
+#include <stdexcept>
 
 class Allegrex;
 
@@ -171,7 +172,7 @@ public:
 	/*
 	 * Used by branching instructins to change the PC. It handles the delay slot.
 	 */
-	static void changePC(Allegrex &cpu, const uint32 target, const bool likely = false);
+	static void jump(Allegrex &cpu, const uint32 target, const bool likely = false);
 	
 	/*
 	 * Computes the target address of a jump instruction.

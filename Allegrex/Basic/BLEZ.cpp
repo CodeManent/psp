@@ -22,6 +22,6 @@ void BLEZ::execute(Allegrex &cpu) const{
 	bool condition = (cpu.SGPR[u.i.rs] <= 0);
 	if(condition){
 		const uint32 target = cpu.PC + expandOffset();
-		changePC(cpu, target +4);
+		jump(cpu, target +4);
 	}
 }

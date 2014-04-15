@@ -1,7 +1,7 @@
 #include "COP0.h"
 #include "Allegrex.h"
-#include "../TODO.h"
 #include "../BusDevice.h"
+#include "UnimplementedOp.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -139,7 +139,7 @@ struct COP0::WiredRegister{
  * Count Register (9)
  *
  * It acts as a timer, incrementing at a constant rate -- half the maximum
- * instruction issue rate -- whether or not an onstruction is executed, retired
+ * instruction issue rate -- whether or not an instruction is executed, retired
  * or any forward progress is made through the pipeline.
  *
  * This register can be read or written. It can be written for diagnostic
@@ -177,10 +177,10 @@ struct COP0::EntryHiRegister{
  *
  * When the value of the Count reg equals the value of the Compare reg,
  * interrupt bit IP(17) in the cause reg is set. This causes an interrupt as
- * soon as the interrupt is enabled.Writing a value to thw Compare reg, as a
+ * soon as the interrupt is enabled.Writing a value to the Compare reg, as a
  * side effect clears the timer interrupt.
  *
- * For diagnostic purposes, the Compare reg is read/erite. In normal use however
+ * For diagnostic purposes, the Compare reg is read/write. In normal use however
  * the compare reg is write only.
  */
 
@@ -198,13 +198,19 @@ struct COP0::StatusRegister{
 	uint KX:1;		//for tlb
 	uint IM:8;		//Interrupt mask
 	//uint DS:9;	//Diagnostic Status field
-	uint DSDE:1;	//Parity or ECC errors cannot cause exceptions (0=parity/ecc remain enabled 1=disables parity/ECC)
+	uint DSDE:1;	//Parity or ECC errors cannot cause exceptions
+	                // 0: parity/ecc remain enabled
+					// 1: disables parity/ECC
 	uint DSCE:1;	//about the ECC register
-	uint DSCH:1;	//Cache hit/miss indication (0=miss 1=hit)
+	uint DSCH:1;	//Cache hit/miss indication
+					// 0: miss
+					// 1: hit
 	uint DSreserved0:1;
 	uint DSSR:1;	//1=Reset* signal or NMI has caused a soft reset exception
 	uint DSTS:1;	//1=TLB shutdown has occurred (read only)
-	uint DSBEV:1;	//TLB refill and general exception vectors (0=normal 1=bootstrap)
+	uint DSBEV:1;	//TLB refill and general exception vectors
+	                // 0: normal
+					// 1: bootstrap
 	uint DSreserved:2;
 	uint RE:1;		//Reverse endian bit, valid in user mode		
 	uint FR:1;		//Floating point registers (0=16regs 1=32regs)
@@ -265,7 +271,7 @@ struct COP0::ConfigRegister{
 	                // 0: 16 bytes
 	                // 1: 32 bytes
 	
-	uint DC:3;		//Primary Dcache size = 2^(12+DC) bytes. In the R$000 this
+	uint DC:3;		//Primary Dcache size = 2^(12+DC) bytes. In the R4000 this
 	                // is set to 8Kbytes, in R4400 this is set to 16Kbytes.
 	                
 	uint IC:3;		//Primary Icache size = 2^(12+IC) bytes. In the R4000 this
@@ -343,7 +349,7 @@ struct COP0::ConfigRegister{
  */
 
 struct COP0::WatchLoRegister{
-	uint W:1;		//1 = Trp on store references
+	uint W:1;		//1 = Trap on store references
 	uint R:1;		//1 = Trap on load references
 	uint reserved:1;
 	uint PAddr0:29;	//Bits 31:3 of the physical address
@@ -419,6 +425,9 @@ struct COP0::STagLoRegister{
 COP0::COP0(Allegrex &al, PSP *bus)
 	:Coprocessor(al),
 	BusDevice(bus),
+	jumpTarget(0),
+	delaySlot(0),
+	cache(bus),
 	indexReg(reinterpret_cast<IndexRegister &>(reg[Index])),
 	randomReg(reinterpret_cast<RandomRegister &>(reg[Random])),
 	entryLo0Reg(reinterpret_cast<EntryLoRegister &>(reg[EntryLo0])),
@@ -438,15 +447,43 @@ COP0::COP0(Allegrex &al, PSP *bus)
 	ptagLoReg(reinterpret_cast<PTagLoRegister &>(reg[TagLo])),
 	stagLoReg(reinterpret_cast<STagLoRegister &>(reg[TagLo]))
 {
+	// TODO: complete config register values
+	//set the configuration information in the config register
+	// configReg.K0 = ????
+	// configReg.CU = ???
+	configReg.DB = 1; // Primary Dcahce line size = 32 bytes
+	configReg.IB = 1; // Primary ICache line size = 32 bytes
+	configReg.DC = 4; // 16K DCache
+	configReg.IC = 4; // 16K ICache
+	// configReg.EB = ??? block orgering
+	// configReg.EM = ??? ECC mode enable
+	configReg.BE = 0; // Kernel and memory are little endian
+	//configReg.SM = ??? dirty shared coherent state
+	configReg.SC = 1; // No s-Cache present
+	configReg.EW = 0; // system port width = 64 (only valid value)
+	configReg.SW = 0; // 128bit data path to s-cache (only valid value)
+	configReg.SS = 0; // joint s-cache
+	configReg.SB = 3; // 32 words cache line for s-cache
+	// configReg.EP = ???
+	// configReg.EC = ???
+	// configReg.CM = ???
+
+	
+
+
 	pridReg.imp = 0x04;//R4000
-	TODO("proper revision number")
+	// TODO: proper revision number
 	pridReg.rev = 1;//??? I just added it
+	pridReg.imp = 1;
 
 	statusReg.DSTS = 0;
 	statusReg.ERL = 1;
 	statusReg.DSBEV =1;
 
-	statusReg.UX = 0;	//32bit useg is selected 
+	statusReg.UX = 0;	//32bit useg is selected
+	statusReg.KSU = 0; // set kernel mode
+
+	reset();
 }
 
 COP0::~COP0(void)
@@ -461,27 +498,128 @@ COP0::~COP0(void)
  * NOT COMPLETED
  */
 long COP0::step(){
+	// should increase at maximum half the instruction issue rate
+	reg[Count] += 1;
+	//if count reg equals compare reg
+	if(reg[Compare] == reg[Count]){
+		// set interrupt flag 17 in the cause reg
+		causeReg.IP |= 0x10000;
+	}
+
+	// if interrupts are enabled and an unmasked interrupt is pending 
+	if( statusReg.IE & statusReg.IM & causeReg.IP){
+		// Raise an interrupt exception
+		throw COP0::Int;
+	}
+
 	try{
-		const uint32 inst = loadMemory32(cpu.PC);
-		std::cout << std::hex << std::setw(8)
-			<< "PC = 0x" << cpu.PC
+		if(jumpTarget){
+			if(delaySlot){
+				cpu.PC = delaySlot;
+				// set flag indicating we are in a delay slot
+				causeReg.BD = 1;
+
+				// we'll execute the delay slot. no other pending delay slot
+				delaySlot = 0;
+			}
+			else{
+				cpu.PC = jumpTarget;
+				// clear delay slot flag
+				causeReg.BD = 0;
+
+				// branch taken, clear the var so the execution continues
+				jumpTarget = 0;
+			}
+		}
+
+		const uint32 inst = loadMemory32(cpu.PC, INST);
+		//*
+		std::cout << std::hex << std::setfill('0')
+			<< "PC = 0x" << std::setw(8) << cpu.PC
+			<< "\t0x" << std::setw(8) << inst
 			<< '\t' << Instruction::disassemble(inst)
 			<< std::endl;
+		// */
 		cpu.execute(inst);
 		cpu.PC += 1<<2;
 	}
-	catch(const std::runtime_error &re){
+	catch(const UnimplementedOp &uo){
+		std::cerr
+			// << "Unimplemented instruction"
+			<< uo.dump(cpu)
+			<< '\n'
+			<< std::endl;
+
+		cpu.PC += 1 << 2;
+	}
+	/*
+	catch(const std::logic_error &le){
+		std::cerr << le.what() << std::endl;
+		cpu.PC += 1<<2;
+	}
+	catch(const std::exception &e){
 		std::cerr
 			<< "0x" << std::setw(8) << std::setfill('0') << std::hex << cpu.PC
-			<< '\t' << re.what() << std::endl;
+			<< '\t' << e.what() << std::endl;
 
 		throw;
 	}
+	catch( const char * str){
+		std::cerr << "Exception: " << str << std::endl;
+		cpu.PC += 1<<2;
+	}
+	*/
+	catch(const COP0::ExceptionCode code){
+		// clear jump target and delay slot vars as they will be handled by the 
+		// exception handler
+		jumpTarget = 0;
+		delaySlot = 0;
+		static int exp = 0;
+		if(++exp > 5)
+			throw std::runtime_error("Exception count > 5");
+
+		std::cout << "----------------------------Handling excepion " << code << std::endl;
+		//todo: handle cache exceptions and NMI
+		switch(code){
+		case Mod:	// TLB errors
+		case TLBL:
+		case TLBS:
+			throw std::runtime_error("TLB exception");
+
+		case AdEL:	// Address error
+		case AdES:
+		case VCEI:	// Virtual coherency exception
+		case VCED:
+		case IBE:	// Bus error
+		case DBE:
+		case Ov:	// Integer overflow
+		case Tr:	// Trap
+		case SYS:	// System Call
+		case Bp:	// Breakpoint
+		case RI:	// Reserved Instruction
+		case CpU:	// Coprocessor unusable
+		case FPE:	// Floating point exception
+		case WATCH:	// Watch exception
+		case Int:	// Interrupt exception
+			generalException();
+			break;
+
+		case CacheCode:
+			std::cout << "Handling a cache error" << std::endl;
+			cacheError();
+			break;
+
+		case NMICode:
+			NMI();
+			break;
+		}
+	}
+	
 	return 1;
 }
 
 
-TODO("method parameters")
+// TODO: method parameters
 void COP0::reset(){
 	//reg[Random] = TLBENTRIES - 1;
 
@@ -503,6 +641,9 @@ void COP0::reset(){
 	statusReg.DSBEV = 1;
 	//cpu.PC = 0xFFFFFFFFFBFC00000;
 	cpu.PC = 0xBFC00000;
+
+	//TODO: check if kernel mode after reset
+	//statusReg.KSU = 0; // set kernel mode
 }
 
 void COP0::cacheError(){
@@ -515,7 +656,7 @@ void COP0::cacheError(){
 	}
 
 	statusReg.EXL=1;
-
+	
 	if(statusReg.DSBEV == 1){
 		//if bootstrap
 		cpu.PC = 0xBFC00200 + 0x00000100;
@@ -558,7 +699,7 @@ void COP0::generalException(){
 		else{
 			reg[EPC] = cpu.PC;
 		}
-TODO("set cause register")
+// TODO: set cause register
 /*
 		if(TLBrefill){
 			vector=0x000
@@ -574,7 +715,7 @@ TODO("set cause register")
 		vector=0x180;
 	}
 	else{
-TODO("set cause register")
+		//TODO: set cause register
 		vector=0x180;
 	}
 
@@ -588,6 +729,67 @@ TODO("set cause register")
 		cpu.PC = 0x80000000 + vector;
 	}
 }
+
+void COP0::raiseException(const COP0::ExceptionCode code)
+{
+	//clear jump and pending delay as the pc will be reset on the jump inst.
+	jumpTarget = 0;
+	delaySlot = 0;
+
+	// set the error code
+	causeReg.ExcCode = code;
+
+	// unwind the stack and handle the exception in te step method.
+	throw code;
+}
+
+/*
+ * Checks whether the requested coprocessor is usable. If the requested
+ * coprocessor can not be used, an appropriate exception is raised.
+ */
+void COP0::verifyCoprocessorUsability(unsigned int COPnum){
+	bool usable = true;
+
+	//if in kernel mode and system coprocessor
+	if(statusReg.KSU == 0 && COPnum == 0){
+		//Regardless of the CU0 bit setting, CP0 is always usable in
+		// Kernel mode.
+		return;
+	}
+
+	//checking the status register wether the coprocessor is usable
+	switch(COPnum){
+		case 0: usable = statusReg.CU0; break;
+		case 1: usable = statusReg.CU1; break;
+		case 2: usable = statusReg.CU2; break;
+		case 3: usable = statusReg.CU3; break;
+		default:
+			// allegrex can have up to 4 coprocessors numbered 0 to 3
+			std::runtime_error("COP0: Bad coprocessor number given");
+	}
+
+	/* alternate method to check usability
+	// bounds checking on input
+	if(COPnum > 3){
+		throw std::runtime_error("COP0: Bad coprocessor number given");
+	}
+	//get the apropriate usability bit according to the coprocessor number
+	usable = (reg[Status] >> (28 + COPnum) ) & 0x01;
+	*/
+
+
+	//if the requested coprocessor is not usable
+	if(!usable){
+		//set the coprocessor number in the cause register to be available
+		// for the excexption handler
+		causeReg.CE = COPnum;
+		// and raise the exception
+		raiseException(CpU);
+	}
+}
+
+
+
 
 
 COP0::Segment COP0::getSegment(const uint32 vAddr) const{
@@ -685,21 +887,21 @@ uint32 COP0::addressTranslation(const uint32 vAddr, bool &cachable) const{
  *
  * The implementation ignores the cache for now and always loads from memory.
  */
-uint32 COP0::loadMemory32(const uint32 vAddr){
+uint32 COP0::loadMemory32(const uint32 vAddr, LoadType role){
 //	uint32 pAddr = AddressTranslation(vAddr, DATA);
 //	pAddr &= 0xfffffffC;
 //	uint32 mem = loadMemory(uncached, WORD, pAddr, vAddr, DATA);
 //	cpu.GPR[u.i.rt] = mem;
 
-	if(!validateAddress(vAddr)){
-		throw std::runtime_error("COP0: Address error exception");
-	}
+	if(!validateAddress(vAddr))
+		raiseException(AdEL);
 	
 	bool cachable;
 	const uint32 pAddr = addressTranslation(vAddr, cachable);
 
 	//Remove it after cache implementation
-	cachable = false;
+//	if(role == INST)
+//		cachable = false;
 
 	if(cachable){
 		//read from cache
@@ -708,19 +910,24 @@ uint32 COP0::loadMemory32(const uint32 vAddr){
 		const uint32 word = vAddr & 0x0000001f;
 		dCacheLine &dcl = dCache[line];
 		*/
-		TODO("COP0: Finish cache implementation")
-		return 0;
+		// TODO: finish cache inomementation
+		if(role == DATA)
+			return cache.dRead(vAddr, pAddr);
+		else // if(role == INST)
+			return cache.iRead(vAddr, pAddr);
 	}
 	else{
+		//TODO: abstract bus reading/locking/pending
 		//read from memory
 		const BusDevice::Request r = {BusDevice::devCPU, BusDevice::devMainMemory, BusDevice::Read, pAddr, 0};
 
 		//enable the flag so to accept the data form the bus
 		dataPending = true;
 
-		cpu.sendRequest(r);
-		//With the current implementation the control will return here after the data are read
-		//so no wait is actually needed (but leave it because no harm is done now).
+		sendRequest(r);
+		//With the current implementation the control will return here after
+		// the data are read so no wait is actually needed (but leave it
+		// because no harm is done now and for debugging).
 
 		while(dataPending){
 			//wait
@@ -729,6 +936,45 @@ uint32 COP0::loadMemory32(const uint32 vAddr){
 		return receivedData;
 	}
 }
+
+
+void COP0::writeMemory(const uint32 vAddr, const uint32 data)
+{
+	if(!validateAddress(vAddr))
+		raiseException(AdES);
+
+	bool cachable = false;
+	const uint32 pAddr = addressTranslation(vAddr, cachable);
+	
+	//remove it after cache implementation
+	cachable = false;
+
+	if(cachable){
+		// write to cache
+		throw std::runtime_error("COP0: Cache not implemented yet");
+	}
+	else{
+		//create a request to write the data at the appropriate address
+		const BusDevice::Request r = {
+			BusDevice::devCPU,
+			BusDevice::devMainMemory,
+			BusDevice::Write,
+			pAddr,
+			data
+		};
+
+		// and reques the write
+		sendRequest(r);
+	}
+}
+
+
+void COP0::jump(const uint32 target, const bool likely){
+	jumpTarget = target;
+	if(!likely)
+		delaySlot = cpu.PC + (1<<2);
+}
+
 
 /*
  * Received data after they have been requested.
@@ -748,6 +994,11 @@ void COP0::receiveData(uint32 data){
 
 void COP0::serviceRequest(const struct BusDevice::Request &req)
 {
+	if(req.to == BusDevice::devCPUCACHE){
+		cache.serviceRequest(req);
+		return;
+	}
+
 	switch(req.function){
 		case BusDevice::Reset:
 			reset();

@@ -43,7 +43,7 @@ public:
 			// + 4 because the target address is computed based on the PC of
 			// the delay slot.
 			const int32 target = cpu.PC +  expandOffset();
-			changePC(cpu, target + 4, true);
+			jump(cpu, target + 4, true);
 		}
 	}
 };

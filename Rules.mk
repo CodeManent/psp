@@ -34,7 +34,7 @@ TARGET_OBJS := $(TARGET_OBJS) $(OBJS_$(d))
 
 
 $(TARGET_BIN): $(TARGET_OBJS)
-	@echo "Building target bin: " $(TARGET_BIN)
+	@echo "Building (linking) target bin: " $(TARGET_BIN)
 	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 

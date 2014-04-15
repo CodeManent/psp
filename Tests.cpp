@@ -85,7 +85,8 @@ bool testLoadMemory()
 {
 	//The test value 
 	uint32 testVal = 0x51DEB00B;
-	uint32 testAddr = 0x000000A0;
+	// uint32 testAddr = 0x000000A0;
+	uint32 testAddr = 0xBFD000A0;
 	PSP testPsp;
 
 	//put the test value in the main memory

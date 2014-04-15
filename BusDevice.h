@@ -5,6 +5,7 @@
 #include "IntTypes.h"
 
 #include <cstddef> //size_t
+#include <iostream>
 
 class PSP;
 
@@ -14,6 +15,7 @@ class BusDevice
 public:
 	enum Device{
 		devCPU,
+		devCPUCACHE,
 		devMainMemory,
 		devGraphicsCore,
 		devAVCDecoder,
@@ -37,6 +39,7 @@ public:
 		enum Function function;
 		uint32 param1;
 		uint32 param2;
+		std::string toString() const;
 	};
 
 	BusDevice(PSP *bus);
@@ -48,5 +51,6 @@ protected:
 	virtual void sendRequest(const struct Request &req);
 };
 
+std::ostream& operator<<(std::ostream &os, const BusDevice::Request &r);
 
 #endif

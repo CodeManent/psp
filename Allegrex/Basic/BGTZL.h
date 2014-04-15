@@ -34,7 +34,7 @@ public:
 		bool condition = (cpu.SGPR[u.i.rs] > 0);
 		if(condition){
 			uint32 target = cpu.PC +  expandOffset();
-			changePC(cpu, target + 4, true);
+			jump(cpu, target + 4, true);
 		}
 	}
 };

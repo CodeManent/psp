@@ -4,39 +4,19 @@
 
 #include "Coprocessor.h"
 #include "../BusDevice.h"
+#include "Cache.h"
 
 class COP0: public Coprocessor, public BusDevice
 {
+	friend class ERET;
+	friend class  CACHE;
 	// *****THERE IS NO TLB IN ALLEGREX*****
 
-	//8 word lines (4*64 bit per cache line)
-
-	struct iCacheLine{
-	//	uint P:1;		//Even parity for the PTag and V fields
-		uint V:1;		//Valid bit
-		uint PTag:24;	//Physical tag (bits 35:12 of the physical   address)
-	//	uint8 DataP[4];	//Even parity; 1 parity bit per byte of data
-		uint64 Data[4]; //Cache data
-	};
-
-	struct dCacheLine{
-	//	uint WP:1;		//Even parity for the write-back bit
-		uint W:1;		//Write-back bit (set if cache line has been written)
-	//	uint P:1;		//Even parity for the PTag and CS fields
-		uint CS:2;		/*Primary cache state:
-							0 = Invalid in all R4000 configurations
-							1 = Shared (either Clean or Dirty) in R4000MC configuration only
-							2 = Clean Exclusive in R4000SC and MC configurations only
-							3 = Dirty Exclusive in all R4000 configurations*/
-		uint PTag:24;	//Physical tag (bits 35:12 of the physical   address)
-	//	uint8 DataP[4];	//Even parity; 1 parity bit per byte of data
-		uint64 Data[4]; //Cache data
-	};
-	
-	iCacheLine iCache[512]; // 1<<9 512 entries - 32Kb iCache
-	dCacheLine dCache[512]; // 512 entries - 32Kb dCache
-	uint32 primaryCache[128];
-
+	// two helping vars to handle the branching instructions
+	uint32 jumpTarget;
+	uint32 delaySlot;
+	bool LLbit;
+	Cache cache;
 
 	struct IndexRegister;
 	struct RandomRegister;
@@ -125,11 +105,18 @@ public:
 		Tr = 13,	//Trap exception
 		VCEI = 14,	//Virtual coherency Exception instruction
 		FPE = 15,	//Floating-Point exception
-
+		/* 16 - 22 RESERVED */
 		WATCH = 23,	//Reference to WatchHi/WatchLo address
+		/* 24 - 30 RESERVED */
+		VCED = 31,	//Virual Coherency Exception data
 
-		VCED = 31	//Virual Coherency Exception data
+		// use reserved space for caceh and NMI exceptions
+		CacheCode = 24,
+		NMICode = 25
 	};
+	
+
+
 
 	COP0(Allegrex &al, PSP *bus);
 	virtual ~COP0(void);
@@ -139,7 +126,9 @@ public:
 	void cacheError();			//Cache Error Exception Processing
 	void NMI();					//Soft Reset and NMI Exception Processing
 	void generalException();	//General Exception Processing (Except Reset, Soft Reset, NMI, and Cache Error)
-	void raiseException(ExceptionCode code);
+	void raiseException(const ExceptionCode code);
+	void verifyCoprocessorUsability(unsigned int COPnum);
+
 
 	enum Segment{
 		useg,	//0x00000000 - 0x80000000
@@ -154,11 +143,14 @@ public:
 
 	uint32 addressTranslation(const uint32 vAddr, bool &cachable) const;
 
-	uint32 loadMemory32(const uint32 vAddr);
+	enum LoadType{INST, DATA};
+	uint32 loadMemory32(const uint32 vAddr, LoadType role = DATA);
 	void writeMemory(const uint32 vAddr, const uint32 data);
 
 	uint32 receivedData;
 	bool dataPending;
+
+	void jump(const uint32 target, const bool likely);
 
 	void receiveData(uint32 data);
 	virtual void serviceRequest(const struct BusDevice::Request &req);

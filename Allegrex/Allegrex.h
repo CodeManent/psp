@@ -9,6 +9,7 @@
 
 #include "Instruction.h"
 #include "COP0.h"
+#include "FPU.h"
 
 class Allegrex:
 	public BusDevice
@@ -20,13 +21,13 @@ public:
 	int32 *SGPR;
 
 	uint32 PC;			// program counter
-//	uint32 nextPC;		// delay slot
 	uint32 HI;			// Integer multiply/divide result HI
 	uint32 LO;			// Integer multiply/divide result LO
 
 	uint32 debug_registers[32];
 
 	COP0 systemCoprocessor;
+	FPU floatingPointUnit;
 
 	Allegrex(PSP *bus);
 	~Allegrex(void);
@@ -37,6 +38,8 @@ public:
 	void execute(const uint32 &inst);
 
 	virtual void serviceRequest(const struct Request &req);
+	Coprocessor& getCoprocessor(unsigned int COPnum);
+
 
 
 	enum Register{
@@ -99,47 +102,46 @@ public:
 		opSPECIAL3	= 0x1f,
 		opLB	= 0x20,
 		opLH	= 0x21,
-		opLWL	= 0x22,
+		opLWL	= 0x22, //TODO: Load Word Left
 		opLW	= 0x23,
 		opLBU	= 0x24,
 		opLHU	= 0x25,
-		opLWR	= 0x26,
+		opLWR	= 0x26, // TODO: Load Word Right
 		/*  0x27 reserved or unsupported */
 		opSB	= 0x28,
 		opSH	= 0x29,
-		opSWL	= 0x2A,
+		opSWL	= 0x2A, // TODO: Store Word Left
 		opSW	= 0x2B,
 		/*  0x2c reserved or unsupported */
 		/*  0x2d reserved or unsupported */
-		opSWR	= 0x2E,
+		opSWR	= 0x2E, // TODO: Store Word Right
 		opCACHE	= 0x2f,
-		opLL	= 0x30,
-		opLWC1	= 0x31,
-		opLVS	= 0x32,
-		/*  0x32 reserved or unsupported */
+		opLL	= 0x30, // TODO: Load Linked
+		opLWC1	= 0x31, // TODO: Load FPU Register
+		opLVS	= 0x32, // TODO: Load Scalar VFPU Register
 		/*  0x33 reserved or unsupported */
 		opVFPU4	= 0x34,
-		opULVQ	= 0x35,
-		opLVQ	= 0x36,
+		opULVQ	= 0x35, //TODO: Load Quad VFPU Register (unaligned)
+		opLVQ	= 0x36, //TODO: Load Quad VFPU Register
 		opVFPU5	= 0x37,
-		opSC	= 0x38,
-		opSWC1	= 0x39,
-		opSVS	= 0x3a,
+		opSC	= 0x38, // TODO: Store Conditionally
+		opSWC1	= 0x39, // TODO: Store FPU Register
+		opSVS	= 0x3a, // TODO: Store Scalar VFPU Register
 		/*  0x3b reserved or unsupported */
 		opVFPU6	= 0x3c,
-		opUSVQ	= 0x3d,
-		opSVQ	= 0x3e,
+		opUSVQ	= 0x3d, // TODO: Store QUAD VFPU Register (Unaligned)
+		opSVQ	= 0x3e, // TODO: Store Quad VFPU Register
 		opVFPU7	= 0x3f// SPECIAL: encoded by function field when opcode field = SPECIAL
 	};
 	enum SpecialOpcodes{
 		opNOP	= 0x00,
 		opSLL	= 0x0,
-		/*  0x1 reserved or unsupported */
+		/*  0x1 reserved or unsupported maybe */
 		opSRLROR = 0x2,
 		opSRA	= 0x3,
 		opSLLV	= 0x4,
-		/*  0x5 reserved or unsupported */
-		opSRLRORV = 0x6,
+		/*  0x5 reserved or unsupported  */
+		opSRLVROTRV = 0x6,
 		opSRAV	= 0x7,
 		opJR	= 0x8,
 		opJALR	= 0x9,
@@ -177,11 +179,35 @@ public:
 		/*  0x29 reserved or unsupported */
 		opSLT	= 0x2a,
 		opSLTU	= 0x2b,
-		opMAX		= 0x2c,
+		opMAX	= 0x2c,
 		opMIN	= 0x2d,
 		opMSUB	= 0x2e,
 		opMSUBU	= 0x2f
 	};
+
+	enum REGIMMOocodes{
+		opBLTZ    = 0x00,
+		opBGEZ    = 0x01,
+		opBLTZL   = 0x02,
+		opBGEZL   = 0x04,
+		/* 0x05 - 0x10 reserves/unsupported */
+		opBLTZAL  = 0x10,
+		opBGEZAL  = 0x11,
+		opBLTZALL = 0x12,
+		opBGEZALL = 0x13
+	};
+
+	enum COP0Opcodes{
+		opMFC0 = 0x00,
+		/* 0x01 reserved/undefined */
+		opCFC0 = 0X02,
+		opMTC0 = 0X04,
+		opCTC0 = 0X06,
+		opERET = 0X10,
+
+	};
+	//finish the opcodes
 };
 
 #endif
+

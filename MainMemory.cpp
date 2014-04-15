@@ -4,51 +4,68 @@
 #include <stdexcept>
 #include <iostream>
 #include <iomanip>
+#include <vector>
+#include <fstream>
+#include <algorithm>
+#include <iterator>
 
-MainMemory::MainMemory(PSP *bus):BusDevice(bus)
+#include "Allegrex/Instruction.h"
+
+MainMemory::MainMemory(PSP *bus, uint32 base, uint32 size, const std::string path)
+:BusDevice(bus),
+base(base)
 {
+	//allocate the memory
+	memory.resize(size >> 2);
+	
+	//load the file into memory, if one specified
+	if(path.length() != 0){
+	try{
+		//open file and read it
+		std::ifstream f(path);
+		f.exceptions(std::ios_base::badbit | std::ios_base::failbit);
+		std::vector<char> charFile;
+		std::copy(
+			std::istreambuf_iterator<char>(f),
+			std::istreambuf_iterator<char>(),
+			std::back_inserter(charFile)
+		);
+
+		// get the top so as to not go over the size of the memory vector if
+		// the file is bigger
+		auto top = charFile.size() /sizeof(uint32);
+		top = std::min(top, memory.size());
+
+		// copy the data in the memory vector as ints.
+		for(size_t i = 0; i < top; ++i){
+			uint32 val = 0;
+			for(size_t p = 0; p < sizeof(uint32); ++p){
+				// unsigned char to avoid sign expansion
+				uint32 tmp = (unsigned char) charFile[sizeof(uint32)*i + p];
+				tmp <<= p*8;
+				val |= tmp;
+			}
+			memory[i] = val;
+		}
+	}
+	catch(const std::exception &e){
+		std::string msg = "Couldn't load file: " + path;
+		std::throw_with_nested( std::runtime_error(msg));
+	}
+	}
 }
+
 
 MainMemory::~MainMemory(void)
 {
 }
 
-/*
- * Returns the memory cell to be used for reading.
- * It checks the memory map and returns a reference to the memory cell
- * that will be used for reading. 
- */
-const uint32& MainMemory::getCell(const uint32 addr) const{
-	//find memory bank
-	for(auto &entry: memoryMap)
-		if(entry.start <= addr && addr <= entry.end)
-			//and return a reference to the memory location
-			return entry.data.at((addr - entry.start) >> 2);
-
-	throw std::runtime_error("Main Memory: adress error");
-}
-
-/*
- * Returns the memory cell to be used for writting.
- * It is the same as for reading except it is not cosnt
- */
-uint32& MainMemory::getCell(const uint32 addr){
-	for(auto &entry: memoryMap)
-		if(entry.start <= addr && addr <= entry.end)
-			return entry.data.at((addr - entry.start) >> 2);
-	
-	throw std::runtime_error("Main Memory: Address error");
-}
-
-
 uint32 MainMemory::read(const uint32 addr) const{
-//	std::cout << "Reading from 0x"
-//		<< std::setw(8) << std::setfill('0') << std::hex << addr << std::endl;
-	return getCell(addr);
+	return memory.at((addr-base) >> 2);
 }
 
 void MainMemory::write(const uint32 addr, const uint32 data){
-	getCell(addr) = data;
+	memory.at((addr-base) >> 2) = data;
 }
 
 void MainMemory::serviceRequest(const struct BusDevice::Request &req){

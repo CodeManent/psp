@@ -24,5 +24,5 @@ std::string JALR::disassemble() const{
 void JALR::execute(Allegrex &cpu) const{
 	const uint32 temp = cpu.GPR[u.r.rs];
 	cpu.GPR[u.r.rd] = cpu.PC + 8;
-	changePC(cpu, temp);
+	jump(cpu, temp);
 }

@@ -14,6 +14,7 @@ public:
 
 	virtual std::string disassemble() const;
 	virtual void execute(Allegrex &cpu) const;
+	std::string dump(const Allegrex &cpu) const;
 };
 
 #endif

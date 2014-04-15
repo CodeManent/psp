@@ -22,9 +22,7 @@ void ADDI::execute(Allegrex &cpu) const{
 	const int32 signExtended = signExtendImm();
 
 	if(additionOverflows(cpu.SGPR[u.i.rs], signExtended)){
-		//raise integer overflow exception
-		TODO("raise integer overflow exception")
-
+		cpu.systemCoprocessor.raiseException(COP0::Ov);
 	}
 
 	cpu.SGPR[u.i.rt] = cpu.SGPR[u.i.rs] + signExtended;

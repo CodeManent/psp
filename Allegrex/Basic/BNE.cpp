@@ -22,7 +22,7 @@ void BNE::execute(Allegrex &cpu) const{
 	bool condition = (cpu.GPR[u.i.rs] != cpu.GPR[u.i.rt]);
 	if(condition){
 		const uint32 target = cpu.PC + expandOffset();
-		changePC(cpu, target + 4);
+		jump(cpu, target + 4);
 	}
 }
 

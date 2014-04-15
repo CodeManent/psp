@@ -12,6 +12,8 @@ OBJS_$(d)	:= $(BINDIR)/$(d)/ADDU.o \
 			$(BINDIR)/$(d)/AND.o \
 			$(BINDIR)/$(d)/JALR.o \
 			$(BINDIR)/$(d)/JR.o \
+			$(BINDIR)/$(d)/MAX.o \
+			$(BINDIR)/$(d)/MIN.o \
 			$(BINDIR)/$(d)/NOP.o \
 			$(BINDIR)/$(d)/NOR.o \
 			$(BINDIR)/$(d)/OR.o \

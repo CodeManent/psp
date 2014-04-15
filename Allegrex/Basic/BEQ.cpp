@@ -23,6 +23,6 @@ void BEQ::execute(Allegrex &cpu) const{
 	if(condition){
 		const int32 target = cpu.PC + expandOffset();
 		// + 4 because the target is computed based on the PC of the delay slot.
-		changePC(cpu, target+4);
+		jump(cpu, target+4);
 	}
 }

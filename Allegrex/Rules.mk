@@ -15,9 +15,13 @@ include $(dir)/Rules.mk
 dir := $(d)/Special
 include $(dir)/Rules.mk
 
+dir := $(d)/COP0_INST
+include $(dir)/Rules.mk
 
 OBJS_$(d)	:= $(BINDIR)/$(d)/Allegrex.o \
 			$(BINDIR)/$(d)/COP0.o \
+			$(BINDIR)/$(d)/FPU.o \
+			$(BINDIR)/$(d)/Cache.o \
 			$(BINDIR)/$(d)/Instruction.o \
 			$(BINDIR)/$(d)/UnimplementedOp.o
 

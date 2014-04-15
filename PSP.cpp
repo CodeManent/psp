@@ -4,16 +4,48 @@
 #include "Allegrex/Allegrex.h"
 
 #include <stdexcept>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
 
-PSP::PSP(void):cpu(NULL), mainMemory(NULL)
+PSP::PSP(void)
 {
-	cpu = new Allegrex(this);
-	mainMemory = new MainMemory(this);
+	struct entryDescriptor{
+		uint32 start;
+		uint32 end;
+		const char* description;
+		const char *path;
+	} edl[] = {
+		// TODO: remove line or add it as ME memory.
+		{0x00000000, 0x000fffff, "Added because errors", "../Data/msipl.bin"},
+		{0x00010000, 0x00013fff, "Scratchpad", ""},
+		{0x04000000, 0x041fffff, "Video Memory/Frame buffer", ""},
+		{0x08000000, 0x09ffffff, "Main Memory", ""},
+		//{0x1c000000, 0x1fbfffff, "Hardware I/O" ""},
+		{0x1fc00000, 0x1fcfffff, "Hardware Exception Vectors (RAM)", "../Data/msipl.bin"},
+		{0x1fd00000, 0x1fdfffff, "Testan IPL", "../Data/msipl.bin"}
+		//{0x1fd00000, 0x1fffffff, "Hardware I/O", ""}
+	};
+
+	for(auto &e : edl){
+		std::unique_ptr<BusDevice> bd(
+			new MainMemory(this, e.start, e.end-e.start+1, e.path)
+		);
+
+		memoryMapEntry mme = {
+			e.start,
+			e.end,
+			std::move(bd),
+			e.description
+		};
+		memoryMap.emplace_back(std::move(mme));
+	}
+
+	cpu.reset(new Allegrex(this));
 }
 
 PSP::~PSP(void)
 {
-	delete mainMemory;
 }
 
 void PSP::run(){
@@ -32,9 +64,8 @@ void PSP::run(){
 	};
 	cpu->serviceRequest(r);
 
-	//static_cast<Allegrex *>(cpu)->execute(0x3ff9983f);
 	while(true){
-		static_cast<Allegrex *>(cpu)->step();
+		dynamic_cast<Allegrex *>(cpu.get())->step();
 		forwardRequests();
 	}
 }
@@ -73,7 +104,29 @@ void PSP::forwardRequests(){
 			break;
 
 		case BusDevice::devMainMemory:
-			mainMemory->serviceRequest(req);
+			//mainMemory->serviceRequest(req);
+			// Select memory map entry by examining the address (re1.param1)
+			for(auto &e : memoryMap){
+			/*
+				std::cerr << std::hex
+					<< "PSP: Memory: Checking "
+					<< e.start << " <= " << req.param1
+					<< " (=" << (e.start <= req.param1) << ") && "
+					<< req.param1 << " <= " << e.end
+					<< "i (=" << (req.param1 <= e.end) << ") --> "
+					<< ((e.start <= req.param1) && (req.param1 <= e.end))
+					<< std::endl;
+				*/
+				if((e.start <= req.param1) && (req.param1 <= e.end)){
+					e.device->serviceRequest(req);
+					return;
+					//break;
+				}
+			}
+
+			throw std::runtime_error(
+				std::string("PSP: Address not in an allocated memory space: ")
+				+ req.toString());
 			break;
 
 		throwErrorCase(devGraphicsCore);
@@ -84,16 +137,21 @@ void PSP::forwardRequests(){
 		throwErrorCase(devSubMemory);
 
 		default:
-			throw std::logic_error("Device does not exist");
+			throw std::logic_error("PSP:Device does not exist: " + req.toString());
 		}
 	}
 }
 
 Allegrex* PSP::getCPU(){
-	return dynamic_cast<Allegrex*>(cpu);
+	return dynamic_cast<Allegrex*>(cpu.get());
 }
 
 MainMemory* PSP::getMainMemory(){
-	return dynamic_cast<MainMemory*>(mainMemory);
-}
+	for(auto &me : memoryMap){
+		if(std::string(me.description) == "Main Memory"){
+			return dynamic_cast<MainMemory*>(me.device.get());
+		}
+	}
 
+	throw std::runtime_error("PSP: Couldn't find Main memory");
+}

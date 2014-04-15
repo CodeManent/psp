@@ -1,6 +1,5 @@
 #include "SRA.h"
 #include "../Allegrex.h"
-#include <sstream>
 
 SRA::SRA(const uint32 inst): Instruction(inst)
 {

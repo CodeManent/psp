@@ -4,7 +4,7 @@
 #pragma once
 
 //#include "Allegrex/Allegrex.h"
-//#include "MainMemory.h"
+#include "MainMemory.h"
 //#include "GraphicsCore.h"
 //#include "AVCDecoder.h"
 //#include "DMAC.h"
@@ -16,16 +16,24 @@
 
 #include <cstddef> // size_t
 #include <queue>
+#include <memory>
+
 class MainMemory;
 class Allegrex;
 
 class PSP
 {
 
-	BusDevice *cpu;
-	BusDevice *mainMemory;
+	std::unique_ptr<BusDevice> cpu;
 	
 	std::queue<BusDevice::Request> requestQueue;
+	struct memoryMapEntry{
+		uint32 start;
+		uint32 end;
+		std::unique_ptr<BusDevice> device;
+		const char *description;
+	};
+	std::vector<memoryMapEntry> memoryMap;
 
 public:
 	PSP(void);
