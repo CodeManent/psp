@@ -97,14 +97,13 @@ void PSP::forwardRequests(){
 
 	#define throwErrorCase(x) case BusDevice::x : throw(#x " is not connected")
 
-		//throwErrorCase(devCPU);
-
+		// Messages (data) going to the CPU's cache are routed through the CPU.
+		case BusDevice::devCPUCACHE:
 		case BusDevice::devCPU:
 			cpu->serviceRequest(req);
 			break;
 
 		case BusDevice::devMainMemory:
-			//mainMemory->serviceRequest(req);
 			// Select memory map entry by examining the address (re1.param1)
 			for(auto &e : memoryMap){
 			/*
@@ -120,7 +119,6 @@ void PSP::forwardRequests(){
 				if((e.start <= req.param1) && (req.param1 <= e.end)){
 					e.device->serviceRequest(req);
 					return;
-					//break;
 				}
 			}
 
