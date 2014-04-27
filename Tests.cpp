@@ -86,7 +86,8 @@ bool testLoadMemory()
 	//The test value 
 	uint32 testVal = 0x51DEB00B;
 	// uint32 testAddr = 0x000000A0;
-	uint32 testAddr = 0xBFD000A0;
+	uint32 testAddr = 0x08000000;
+
 	PSP testPsp;
 
 	//put the test value in the main memory
@@ -132,7 +133,13 @@ bool runTests(){
 		for(auto t : tests)
 		{
 			std::cout << "Running " << t.first;
-			bool result =  (t.second)();
+			bool result = false;
+			try{
+				result =  (t.second)();
+			}
+			catch(const exception &e){
+				std::cout << e.what() << std::endl;
+			}
 			std::cout << "\t\t" << (result? "Succeded" : "Failed") << std::endl;
 			testResults &= result;
 		}
