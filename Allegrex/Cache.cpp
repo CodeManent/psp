@@ -9,10 +9,11 @@
 /*
  * Constructor initializing the cache sizes
  */
-Cache::Cache(PSP *bus)
+Cache::Cache(PSP *bus, COP0 &systemCoprocessor)
 :BusDevice(bus)
 ,iCache(lineCount)
 ,dCache(lineCount)
+,systemCoprocessor(systemCoprocessor)
 {
 }
 
@@ -412,6 +413,30 @@ void Cache::serviceRequest(const struct BusDevice::Request &req){
 		case BusDevice::Reset:
 		default:
 			throw std::logic_error("Cache: function not recognised");
+	}
+}
+
+
+/* Read the tag for the cache block at the specified index and place it into
+ * the TagLo and TagHi CP0 registers, ignoring any ECC or parity errors.
+ * Also load the data ECC or parity bits into the ECC register.
+ */
+void Cache::indexLoadTag(uint32 vAddr, uint32 pAddr, CacheType target){
+	if(target == Data){
+		//get the tag
+		auto tag = getDLine(vAddr, pAddr).tag;
+
+		// construct the coprocessor register
+		COP0::PTagLoRegister coptag;
+		coptag.P = tag.P;
+		coptag.PState = tag.CS;
+		coptag.PTagLo = pAddr >> 12;
+
+		// set the coprocesor register
+		systemCoprocessor.ptagLoReg = coptag;
+	}
+	else{
+		throw std::runtime_error("Cache: index load tag is implemented only for primary data.");
 	}
 }
 

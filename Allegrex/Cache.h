@@ -6,6 +6,8 @@
 #include "../IntTypes.h"
 #include "../BusDevice.h"
 
+class COP0;
+
 /*
  * The R4400 primary caches are fixed at 16 kbytes
 Notes:
@@ -71,11 +73,14 @@ class Cache: public BusDevice{
 	std::vector<ILine> iCache;
 	std::vector<DLine> dCache;
 
+	//reference to the current system cooprocessor
+	COP0 &systemCoprocessor;
+
 	bool dataPending;
 	uint32 receivedData;
 
 public:
-	Cache(PSP *bus);
+	Cache(PSP *bus, COP0 &systemCoprocessor);
 	void CacheOp(uint32 op, uint32 vAddr, uint32 pAddr);
 	enum CacheType {Instruction, Data, Secondary_Instruction, Secondary_Data};
 
