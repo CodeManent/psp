@@ -61,7 +61,7 @@ void Cache::CacheOp(uint32 op, uint32 vAddr, uint32 pAddr){
 		switch(target){
 		case Instruction:
 			description = "Index Invalidate";
-			indexInvalidate(vAddr, pAddr, target);
+			indexInvalidate(vAddr, target);
 			break;
 		case Secondary_Instruction:
 			description = "Index Invalidate";
@@ -182,8 +182,7 @@ uint32 Cache::lineIndex(uint32 vAddr){
 /*
  * Get the inctruction cache line that corresponds to the specified vAddr.
  */
-Cache::ILine& Cache::getILine(uint32 vAddr, uint32 pAddr){
-	(void)pAddr; //suppress unused parameter warning
+Cache::ILine& Cache::getILine(uint32 vAddr){
 	return iCache.at(lineIndex(vAddr));
 }
 
@@ -196,7 +195,7 @@ uint32 Cache::iRead(uint32 vAddr, uint32 pAddr){
 
 	std::cout << "Reading ffrom instruction cache for 0x"
 	          << std::hex << vAddr << std::endl;
-	auto line = getILine(vAddr, pAddr);
+	auto line = getILine(vAddr);
 
 	if(line.tag.PTag != (pAddr>>11)){
 		throw std::runtime_error("Instruction cache miss");
@@ -446,11 +445,11 @@ void Cache::serviceRequest(const struct BusDevice::Request &req){
  *
  * (The index is calculated using the vAddr).
  */
-void Cache::indexInvalidate(uint32 vAddr, uint32 pAddr, CacheType target){
+void Cache::indexInvalidate(uint32 vAddr, CacheType target){
 	if(not(target == Instruction))
 		throw std::runtime_error("Cache: Index invalidate is implemented only for the primary instruction cache");
 	// Gets the line and sets its the valid bit to false.
-	getILine(vAddr, pAddr).tag.V = false;
+	getILine(vAddr).tag.V = false;
 }
 
 
@@ -473,7 +472,7 @@ void Cache::indexLoadTag(uint32 vAddr, uint32 pAddr, CacheType target){
 		systemCoprocessor.ptagLoReg = coptag;
 	}
 	else if(target == Instruction){
-		auto tag = getILine(vAddr, pAddr).tag;
+		auto tag = getILine(vAddr).tag;
 		COP0::PTagLoRegister coptag;
 		coptag.P = tag.P;
 		coptag.PState = tag.V;
@@ -501,7 +500,7 @@ void Cache::hitInvalidate(uint32 vAddr, uint32 pAddr, CacheType target){
 		}
 	}
 	else if(target == Instruction){
-		auto line = getILine(vAddr, pAddr);
+		auto line = getILine(vAddr);
 		if((pAddr >> 12) == line.tag.PTag){
 			line.tag.V = false;
 		}

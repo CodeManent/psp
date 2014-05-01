@@ -88,7 +88,7 @@ public:
 
 	//TODO: remove unused parameted (pAddr for now)
 	//Instruction cache operations
-	ILine& getILine(uint32 vAddr, uint32 pAddr);
+	ILine& getILine(uint32 vAddr);
 	uint32 iRead(uint32 vAddr, uint32 pAddr);
 	ILine iGetLine(uint32 pAddr);
 	//Data cache operations
@@ -99,7 +99,7 @@ public:
 	
 	virtual void serviceRequest(const struct BusDevice::Request &req);
 	
-	void indexInvalidate(uint32 vAddr, uint32 pAddr, CacheType target);
+	void indexInvalidate(uint32 vAddr, CacheType target);
 	void indexWritebackInvalidate(uint32 vAddr, uint32 pAddr, CacheType targ);
 	void indexLoadTag(uint32 vAddr, uint32 pAddr, CacheType target);
 	void indexStoreTag(uint32 vAddr, uint32 pAddr, CacheType target);
