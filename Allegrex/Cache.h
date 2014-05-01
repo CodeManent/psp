@@ -82,7 +82,7 @@ class Cache: public BusDevice{
 public:
 	Cache(PSP *bus, COP0 &systemCoprocessor);
 	void CacheOp(uint32 op, uint32 vAddr, uint32 pAddr);
-	enum CacheType {Instruction, Data, Secondary_Instruction, Secondary_Data};
+	enum CacheType {Instruction=0, Data=1, Secondary_Instruction=2, Secondary_Data=3};
 
 	static uint32 lineIndex(uint32 pAddr);
 

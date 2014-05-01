@@ -55,16 +55,16 @@ void Cache::CacheOp(uint32 op, uint32 vAddr, uint32 pAddr){
 
 	//enumerations to make the code more readable.
 	// TODO: not sure if allegrex follows the MIPS documentation on those operations. Just a note for the future!
-	enum {I=0, D=1, SI=2, SD=3};
+	auto target = static_cast<CacheType>(cacheCode);
 	switch(operationCode){
 	case 0:
-		switch(cacheCode){
-		case I:
-		case SI:
+		switch(target){
+		case Instruction:
+		case Secondary_Instruction:
 			description = "Index Invalidate";
 			break;
-		case D:
-		case SD:
+		case Data:
+		case Secondary_Data:
 			description = "Index Writeback Invalidate";
 			break;
 		}
@@ -72,6 +72,7 @@ void Cache::CacheOp(uint32 op, uint32 vAddr, uint32 pAddr){
 	
 	case 1:
 		description = "Index Load Tag";
+		indexLoadTag(vAddr, pAddr, target);
 		skipped = true;
 		break;
 	
@@ -80,57 +81,74 @@ void Cache::CacheOp(uint32 op, uint32 vAddr, uint32 pAddr){
 		break;
 	
 	case 3:
-		switch(cacheCode){
-			case SD:
-			case D:
+		switch(target){
+			case Secondary_Data:
+			case Data:
 				description = "Create dirty exclusive";
+				break;
+			case Instruction:
+			case Secondary_Instruction:
+				//invalid operation
 				break;
 		}
 		break;
 
 	case 4:
 		description = "Hit Invalidate";
-		switch(cacheCode){
-			case I:
+		switch(target){
+			case Instruction:
 				implemented = true;
 				hitInvalidate(vAddr, pAddr, Instruction);
 				break;
-			case D:
+			case Data:
 				implemented = true;
 				hitInvalidate(vAddr, pAddr, Data);
 				break;
-			case SI:
-			case SD:
+			case Secondary_Instruction:
+			case Secondary_Data:
 				break;
 		}
 		break;
 
 	case 5:
-		switch(cacheCode){
-			case D:
-			case SD:
+		switch(target){
+			case Data:
+			case Secondary_Data:
 				description = "Hit Writeback Invalidate";
 				break;
-			case I:
+			case Instruction:
 				description = "Fill";
+				break;
+			case Secondary_Instruction:
+				// Invalid operation
+				// optional
+				break;
 		}
 		break;
 	
 	case 6:
-		switch(cacheCode){
-			case D:
-			case SD:
-			case I:
+		switch(target){
+			case Data:
+			case Secondary_Data: // Optional
+			case Secondary_Instruction: //Optional
 				description = "Hit Writeback";
+				break;
+			case Instruction:
+				// Invalid operation
 				break;
 		}
 		break;
 	
 	case 7:
-		switch(cacheCode){
-			case SI:
-			case SD:
+		switch(target){
+			case Secondary_Instruction:
+			case Secondary_Data:
 				description = "Hit Set Virtual";
+				break;
+			case Instruction:
+			case Data:
+				// TODO: Fetch and lock maybe
+				// Invalid operation for now
 				break;
 		}
 		break;
@@ -138,12 +156,12 @@ void Cache::CacheOp(uint32 op, uint32 vAddr, uint32 pAddr){
 
 	if(skipped){
 		cout << "Cache: Skipped " << description << " on "
-		     << affectedCacheName[cacheCode] << " cache." << endl;
+		     << affectedCacheName[target] << " cache." << endl;
 	}
 	else if(!implemented){
 		throw runtime_error(
 			"Cache::CacheOp: Unimplemented cache operation: " + description +
-			" on " + affectedCacheName[cacheCode] + " cache."
+			" on " + affectedCacheName[target] + " cache."
 		);
 	}
 		
@@ -430,9 +448,18 @@ void Cache::indexLoadTag(uint32 vAddr, uint32 pAddr, CacheType target){
 		COP0::PTagLoRegister coptag;
 		coptag.P = tag.P;
 		coptag.PState = tag.CS;
-		coptag.PTagLo = pAddr >> 12;
+		coptag.PTagLo = tag.PTag;
 
 		// set the coprocesor register
+		systemCoprocessor.ptagLoReg = coptag;
+	}
+	else if(target == Instruction){
+		auto tag = getILine(vAddr, pAddr).tag;
+		COP0::PTagLoRegister coptag;
+		coptag.P = tag.P;
+		coptag.PState = tag.V;
+		coptag.PTagLo = tag.PTag;
+
 		systemCoprocessor.ptagLoReg = coptag;
 	}
 	else{
