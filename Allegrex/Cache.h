@@ -92,7 +92,7 @@ public:
 	uint32 iRead(uint32 vAddr, uint32 pAddr);
 	ILine iGetLine(uint32 pAddr);
 	//Data cache operations
-	DLine& getDLine(uint32 vAddr, uint32 pAddr);
+	DLine& getDLine(uint32 vAddr);
 	uint32 dRead(uint32 vAddr, uint32 pAddr);
 	DLine dGetLine(uint32 pAddr);
 	void dSaveLine(uint32 pAddr, DLine &line);
@@ -101,7 +101,7 @@ public:
 	
 	void indexInvalidate(uint32 vAddr, CacheType target);
 	void indexWritebackInvalidate(uint32 vAddr, uint32 pAddr, CacheType targ);
-	void indexLoadTag(uint32 vAddr, uint32 pAddr, CacheType target);
+	void indexLoadTag(uint32 vAddr, CacheType target);
 	void indexStoreTag(uint32 vAddr, uint32 pAddr, CacheType target);
 	void createDirtyExclusive(uint32 vaDDR, uint32 pAddr, CacheType target);
 	

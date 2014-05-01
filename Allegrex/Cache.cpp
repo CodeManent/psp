@@ -77,7 +77,7 @@ void Cache::CacheOp(uint32 op, uint32 vAddr, uint32 pAddr){
 	
 	case 1:
 		description = "Index Load Tag";
-		indexLoadTag(vAddr, pAddr, target);
+		indexLoadTag(vAddr, target);
 		skipped = true;
 		break;
 	
@@ -263,8 +263,7 @@ Cache::ILine Cache::iGetLine(uint32 pAddr){
 }
 
 // Data cache operations
-Cache::DLine& Cache::getDLine(uint32 vAddr, uint32 pAddr){
-	(void)pAddr; //suppress unused parameter warning. TODO: use or remove parameter
+Cache::DLine& Cache::getDLine(uint32 vAddr){
 	/*
 	size_t VAbits = ceil(log(cacheSize));
 	//get the cache line index
@@ -281,7 +280,7 @@ Cache::DLine& Cache::getDLine(uint32 vAddr, uint32 pAddr){
  * Read data from the cache. Handle cache miss.
  */
 uint32 Cache::dRead(uint32 vAddr, uint32 pAddr){
-	auto &line = getDLine(vAddr, pAddr);
+	auto &line = getDLine(vAddr);
 
 	// check the tag
 	// keep bits 31-12
@@ -457,10 +456,10 @@ void Cache::indexInvalidate(uint32 vAddr, CacheType target){
  * the TagLo and TagHi CP0 registers, ignoring any ECC or parity errors.
  * Also load the data ECC or parity bits into the ECC register.
  */
-void Cache::indexLoadTag(uint32 vAddr, uint32 pAddr, CacheType target){
+void Cache::indexLoadTag(uint32 vAddr, CacheType target){
 	if(target == Data){
 		//get the tag
-		auto tag = getDLine(vAddr, pAddr).tag;
+		auto tag = getDLine(vAddr).tag;
 
 		// construct the coprocessor register
 		COP0::PTagLoRegister coptag;
@@ -492,7 +491,7 @@ void Cache::indexLoadTag(uint32 vAddr, uint32 pAddr, CacheType target){
 void Cache::hitInvalidate(uint32 vAddr, uint32 pAddr, CacheType target){
 	if(target == Data){
 		// ret the cache line
-		auto line = getDLine(vAddr, pAddr);
+		auto line = getDLine(vAddr);
 		// if the line references the same physical address
 		if((pAddr >> 12) == line.tag.PTag){
 			// set the state of the line to invalid
