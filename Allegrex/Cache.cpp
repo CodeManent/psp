@@ -60,8 +60,13 @@ void Cache::CacheOp(uint32 op, uint32 vAddr, uint32 pAddr){
 	case 0:
 		switch(target){
 		case Instruction:
+			description = "Index Invalidate";
+			indexInvalidate(vAddr, pAddr, target);
+			break;
 		case Secondary_Instruction:
 			description = "Index Invalidate";
+			// not implemented
+			// Allegrex has no secondary cache.
 			break;
 		case Data:
 		case Secondary_Data:
@@ -432,6 +437,20 @@ void Cache::serviceRequest(const struct BusDevice::Request &req){
 		default:
 			throw std::logic_error("Cache: function not recognised");
 	}
+}
+
+/* Set the state of the cache block at the specified index to invalid.
+ *
+ * This required encoding may be used by software to invalidate the entire
+ * instruction cache by stepping through all valid indices.
+ *
+ * (The index is calculated using the vAddr).
+ */
+void Cache::indexInvalidate(uint32 vAddr, uint32 pAddr, CacheType target){
+	if(not(target == Instruction))
+		throw std::runtime_error("Cache: Index invalidate is implemented only for the primary instruction cache");
+	// Gets the line and sets its the valid bit to false.
+	getILine(vAddr, pAddr).tag.V = false;
 }
 
 
