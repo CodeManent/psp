@@ -1,8 +1,8 @@
 ## Build flags for all targets
 #
-CXX = g++-4.8
-CXXFLAGS += -g -pedantic -Wall -Werror -Wextra -std=c++11
-CC       = $(CXX)
+CXX ?= g++
+CXXFLAGS += -g -pedantic -Wall -Werror -Wextra -std=c++11 -fPIC -flto
+CC       ?= $(CXX)
 CFLAGS   = $(CXXFLAGS)
 LDFLAGS +=
 LF_ALL   +=
@@ -34,6 +34,7 @@ $(BINDIR)/%.d: %.cc
 
 # Standard things
 .PHONY: all
+
 all: targets
 
 dir:=.
