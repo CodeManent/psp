@@ -480,7 +480,7 @@ void Cache::indexLoadTag(uint32 vAddr, CacheType target){
 		systemCoprocessor.ptagLoReg = coptag;
 	}
 	else{
-		throw std::runtime_error("Cache: index load tag is implemented only for primary data.");
+		//throw std::runtime_error("Cache: index load tag is implemented only for primary data.");
 	}
 }
 
