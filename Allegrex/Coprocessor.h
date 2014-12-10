@@ -1,5 +1,5 @@
 #ifndef COPROCESSOR_H_
-#define CORIOCESSOR_H_
+#define COPROCESSOR_H_
 #pragma once
 
 #include "../IntTypes.h"
