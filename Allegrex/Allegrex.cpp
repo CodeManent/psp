@@ -170,7 +170,7 @@ std::unique_ptr<Instruction> Allegrex::decode(const uint32 &inst) {
 	case opSPECIAL3: break;
 	case opLB:		retval.reset(new LB(inst));		break;
 	case opLH:		retval.reset(new LH(inst));		break;
-	case opLWL:	return retval;
+	case opLWL:		retval.reset(new LWL(inst));	break;
 	case opLW:		retval.reset(new LW(inst));		break;
 	case opLBU:		retval.reset(new LBU(inst));	break;
     case opLHU:		retval.reset(new LHU(inst));	break;

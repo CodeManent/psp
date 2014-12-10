@@ -102,7 +102,7 @@ public:
 		opSPECIAL3	= 0x1f,
 		opLB	= 0x20,
 		opLH	= 0x21,
-		opLWL	= 0x22, //TODO: Load Word Left
+		opLWL	= 0x22,
 		opLW	= 0x23,
 		opLBU	= 0x24,
 		opLHU	= 0x25,

@@ -22,6 +22,7 @@
 #include "LHU.h"
 #include "LUI.h"
 #include "LW.h"
+#include "LWL.h"
 #include "LWC1.h"
 #include "ORI.h"
 #include "SB.h"
