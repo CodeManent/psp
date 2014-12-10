@@ -25,6 +25,7 @@ OBJS_$(d)	:= $(BINDIR)/$(d)/ADDI.o \
 			$(BINDIR)/$(d)/LW.o \
 			$(BINDIR)/$(d)/LWC1.o \
 			$(BINDIR)/$(d)/LWL.o \
+			$(BINDIR)/$(d)/LWR.o \
 			$(BINDIR)/$(d)/ORI.o \
 			$(BINDIR)/$(d)/SLTI.o \
 			$(BINDIR)/$(d)/SB.o\

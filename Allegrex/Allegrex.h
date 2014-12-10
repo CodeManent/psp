@@ -106,7 +106,7 @@ public:
 		opLW	= 0x23,
 		opLBU	= 0x24,
 		opLHU	= 0x25,
-		opLWR	= 0x26, // TODO: Load Word Right
+		opLWR	= 0x26,
 		/*  0x27 reserved or unsupported */
 		opSB	= 0x28,
 		opSH	= 0x29,
