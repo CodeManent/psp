@@ -30,6 +30,7 @@
 #include "SH.h"
 #include "SW.h"
 #include "SWL.h"
+#include "SWR.h"
 #include "SLTI.h"
 #include "SLTIU.h"
 #include "XORI.h"

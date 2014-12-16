@@ -32,6 +32,7 @@ OBJS_$(d)	:= $(BINDIR)/$(d)/ADDI.o \
 			$(BINDIR)/$(d)/SH.o\
 			$(BINDIR)/$(d)/SW.o \
 			$(BINDIR)/$(d)/SWL.o \
+			$(BINDIR)/$(d)/SWR.o \
 			$(BINDIR)/$(d)/SLTIU.o \
 			$(BINDIR)/$(d)/XORI.o
 
