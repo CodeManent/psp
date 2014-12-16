@@ -110,11 +110,11 @@ public:
 		/*  0x27 reserved or unsupported */
 		opSB	= 0x28,
 		opSH	= 0x29,
-		opSWL	= 0x2A, // TODO: Store Word Left
+		opSWL	= 0x2A,
 		opSW	= 0x2B,
 		/*  0x2c reserved or unsupported */
 		/*  0x2d reserved or unsupported */
-		opSWR	= 0x2E, // TODO: Store Word Right
+		opSWR	= 0x2E,
 		opCACHE	= 0x2f,
 		opLL	= 0x30, // TODO: Load Linked
 		opLWC1	= 0x31, // TODO: Load FPU Register
