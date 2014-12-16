@@ -24,7 +24,7 @@ public:
 	virtual std::string disassemble() const{
 		std::stringstream ss;
 
-		ss << "mtlo\t" << strRd();
+		ss << "mflo\t" << strRd();
 
 		return ss.str();
 	}
