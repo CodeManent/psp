@@ -29,6 +29,7 @@
 #include "SB.h"
 #include "SH.h"
 #include "SW.h"
+#include "SWL.h"
 #include "SLTI.h"
 #include "SLTIU.h"
 #include "XORI.h"
