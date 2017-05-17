@@ -10,6 +10,7 @@
 #include "Instruction.h"
 #include "COP0.h"
 #include "FPU.h"
+#include "VFPU.h"
 
 class Allegrex:
 	public BusDevice
@@ -28,6 +29,7 @@ public:
 
 	COP0 systemCoprocessor;
 	FPU floatingPointUnit;
+	VFPU vectorFloatingPointUnit;
 
 	Allegrex(PSP *bus);
 	~Allegrex(void);

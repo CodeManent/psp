@@ -24,7 +24,8 @@ Allegrex::Allegrex(PSP *bus):
 		HI(0),
 		LO(0),
 		systemCoprocessor(*this, bus),
-		floatingPointUnit(*this)
+		floatingPointUnit(*this),
+		vectorFloatingPointUnit(*this)
 {
 	GPR[sp] = 0x09F70000;
 	GPR[s8] = 0x08000000;
