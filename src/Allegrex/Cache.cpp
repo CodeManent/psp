@@ -424,7 +424,7 @@ void Cache::serviceRequest(const struct BusDevice::Request &req){
 
 		case BusDevice::Reply:
 			if(dataPending){
-				receivedData = req.param2;
+				receivedData = req.param1;
 				dataPending = false;
 			}
 			break;
