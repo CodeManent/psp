@@ -1,0 +1,4 @@
+*.cpp.o
+*.cpp.d
+bin/psp
+.vscode

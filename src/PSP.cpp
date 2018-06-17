@@ -17,13 +17,13 @@ PSP::PSP(void)
 		const char *path;
 	} edl[] = {
 		// TODO: remove line or add it as ME memory.
-		{0x00000000, 0x000fffff, "Added because errors", "../Data/msipl.bin"},
+		{0x00000000, 0x000fffff, "Added because errors", "data/msipl.bin"},
 		{0x00010000, 0x00013fff, "Scratchpad", ""},
 		{0x04000000, 0x041fffff, "Video Memory/Frame buffer", ""},
 		{0x08000000, 0x09ffffff, "Main Memory", ""},
 		//{0x1c000000, 0x1fbfffff, "Hardware I/O" ""},
-		{0x1fc00000, 0x1fcfffff, "Hardware Exception Vectors (RAM)", "../Data/msipl.bin"},
-		{0x1fd00000, 0x1fdfffff, "Testan IPL", "../Data/msipl.bin"}
+		{0x1fc00000, 0x1fcfffff, "Hardware Exception Vectors (RAM)", "data/msipl.bin"},
+		{0x1fd00000, 0x1fdfffff, "Testan IPL", "data/msipl.bin"}
 		//{0x1fd00000, 0x1fffffff, "Hardware I/O", ""}
 	};
 

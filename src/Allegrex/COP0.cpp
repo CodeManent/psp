@@ -420,7 +420,7 @@ kernel:	case 0://kernel
 				//sseg
 				return true;
 			}
-
+			// fallthrough
 		case 2://user
 			if(vAddr < 0x80000000){
 				//useg

@@ -40,7 +40,7 @@ vector<char> readFile(const char*const path){
  * the console.
  */
 bool testDisassemble(){
-    vector<char> ipl(readFile("../Data/msipl.bin"));
+    vector<char> ipl(readFile("data/msipl.bin"));
 	cout << Instruction::disassemble((const uint32 *)(&ipl[0]), ipl.size()*sizeof(char)/sizeof(uint32), 0xBFD00000) << endl;
 	return true;
 }
@@ -132,13 +132,13 @@ bool runTests(){
 	try{
 		for(auto t : tests)
 		{
-			std::cout << "Running " << t.first;
+			std::cout << "Running " << t.first << ": ";
 			bool result = false;
 			try{
 				result =  (t.second)();
 			}
 			catch(const exception &e){
-				std::cout << e.what() << std::endl;
+				std::cout << "Exception: " << e.what();
 			}
 			std::cout << "\t\t" << (result? "Succeded" : "Failed") << std::endl;
 			testResults &= result;

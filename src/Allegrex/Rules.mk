@@ -18,30 +18,14 @@ include $(dir)/Rules.mk
 dir := $(d)/COP0_INST
 include $(dir)/Rules.mk
 
-OBJS_$(d)	:= $(BINDIR)/$(d)/Allegrex.o \
-			$(BINDIR)/$(d)/COP0.o \
-			$(BINDIR)/$(d)/FPU.o \
-			$(BINDIR)/$(d)/VFPU.o \
-			$(BINDIR)/$(d)/Cache.o \
-			$(BINDIR)/$(d)/Instruction.o \
-			$(BINDIR)/$(d)/UnimplementedOp.o
-
-DEPS_$(d)	:= $(OBJS_$(d):%.o=%.d)
-
-CLEAN		:= $(CLEAN) $(OBJS_$(d)) $(DEPS_$(d))
-
-
-TARGET_BIN := $(BINDIR)/$(d)/psp
-TARGET_OBJS := $(TARGET_OBJS) $(OBJS_$(d))
-
-
-$(TARGET_BIN): $(TARGET_OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
-
-
-
-# Incude dependency descriptors
--include $(DEPS_$(d))
+SRC := $(SRC)                \
+	$(d)/Allegrex.cpp        \
+	$(d)/COP0.cpp            \
+	$(d)/FPU.cpp             \
+	$(d)/VFPU.cpp            \
+	$(d)/Cache.cpp           \
+	$(d)/Instruction.cpp     \
+	$(d)/UnimplementedOp.cpp
 
 # Retrieve previous directory from dirstack
 d		:= $(dirstack_$(sp))

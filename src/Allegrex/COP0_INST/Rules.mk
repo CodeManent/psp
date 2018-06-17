@@ -8,16 +8,8 @@ dirstack_$(sp)	:= $(d)
 # set d to the new dir
 d				:= $(dir)
 
-OBJS_$(d)	:= $(BINDIR)/$(d)/ERET.o
-
-DEPS_$(d)	:= $(OBJS_$(d):%.o=%.d)
-
-CLEAN		:= $(CLEAN) $(OBJS_$(d)) $(DEPS_$(d))
-
-TARGET_OBJS	:= $(TARGET_OBJS) $(OBJS_$(d))
-
-# Incude dependency descriptors
--include $(DEPS_$(d))
+SRC := $(SRC)     \
+	$(d)/ERET.cpp
 
 # Retrieve previous directory from dirstack
 d		:= $(dirstack_$(sp))
